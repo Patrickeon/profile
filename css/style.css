@@ -1,0 +1,921 @@
+/* =========================================================================
+   Base CSS styles for AI Portfolio
+   File: css/style.css
+   ========================================================================= */
+
+/* --- 1. CSS Variables (Theming & Colors) --- */
+:root {
+    /* Background Colors */
+    --bg-dark: #0a0a0a;
+    --bg-darker: #050505;
+
+    /* Accent & Neon Colors */
+    --neon-blue: #00f3ff;
+    --neon-blue-glow: rgba(0, 243, 255, 0.4);
+    --neon-purple: #9d00ff;
+    --neon-purple-glow: rgba(157, 0, 255, 0.4);
+    --gradient-primary: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+
+    /* Text Colors */
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --text-muted: #666666;
+
+    /* Fonts (From Google Fonts) */
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-code: 'Courier New', Courier, monospace;
+
+    /* Glassmorphism Configuration */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: 16px;
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* --- 2. CSS Reset & Typography --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    line-height: 1.6;
+    overflow-x: hidden;
+    position: relative;
+    /* Smooth dark background for cases where canvas isn't loaded yet */
+    background-image: radial-gradient(circle at center, #111 0%, var(--bg-dark) 100%);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+}
+
+p {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+}
+
+a {
+    color: var(--neon-blue);
+    text-decoration: none;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+a:hover {
+    color: #fff;
+    text-shadow: 0 0 8px var(--neon-blue);
+}
+
+/* Code/Terminal Font Utility */
+.code-font {
+    font-family: var(--font-code);
+    color: var(--neon-blue);
+    letter-spacing: 0.05em;
+    position: relative;
+    display: inline-block;
+}
+
+/* Typing Cursor */
+.cursor {
+    animation: blink 1s step-end infinite;
+    display: inline-block;
+    vertical-align: text-bottom;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Glitch Effect applied via JS */
+.glitch-text.active-glitch {
+    animation: glitch-anim 0.2s linear infinite;
+    color: #fff;
+    text-shadow: 2px 0 var(--neon-purple), -2px 0 var(--neon-blue);
+}
+
+@keyframes glitch-anim {
+    0% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-2px, 2px);
+    }
+
+    40% {
+        transform: translate(-2px, -2px);
+    }
+
+    60% {
+        transform: translate(2px, 2px);
+    }
+
+    80% {
+        transform: translate(2px, -2px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
+}
+
+/* Gradient Text Utility */
+.text-gradient {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* --- 3. Base Layout Containers --- */
+.app-container {
+    position: relative;
+    z-index: 10;
+    /* Above the canvas background */
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+.section {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 6rem 0;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--text-primary);
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 50%;
+    height: 3px;
+    background: var(--gradient-primary);
+    border-radius: 2px;
+}
+
+/* --- 4. Glassmorphism Utilities --- */
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--glass-shadow);
+    /* Internal highlight for realism */
+    box-shadow: var(--glass-highlight), var(--glass-shadow);
+    padding: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Optional hover state for interactive glass panels */
+.glass-panel.interactive:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 12px 40px 0 rgba(0, 243, 255, 0.1);
+}
+
+/* --- 5. Background Canvas Wrapper --- */
+.background-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    /* Lowest index, behind content */
+    pointer-events: none;
+    /* Let clicks pass through to content */
+}
+
+/* --- 6. Temporary/Initial Component Styles (To be refined in later phases) --- */
+.btn-primary {
+    display: inline-block;
+    background: transparent;
+    color: var(--text-primary);
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 1rem 2.5rem;
+    border: 2px solid var(--neon-blue);
+    border-radius: 30px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px transparent;
+}
+
+.btn-primary:hover {
+    background: var(--neon-blue-glow);
+    box-shadow: 0 0 20px var(--neon-blue-glow);
+    text-shadow: 0 0 5px #fff;
+    border-color: #fff;
+}
+
+/* Section specific placeholders layout */
+.hero-section {
+    align-items: flex-start;
+}
+
+.title {
+    font-size: 4.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+}
+
+.subtitle {
+    font-size: 1.5rem;
+    max-width: 600px;
+    margin-bottom: 2.5rem;
+}
+
+.about-section,
+.projects-section,
+.contact-section {
+    align-items: stretch;
+}
+
+/* Temporary Dashboard/Console dots */
+.console-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.dot.red {
+    background: #ff5f56;
+}
+
+.dot.yellow {
+    background: #ffbd2e;
+}
+
+.dot.green {
+    background: #27c93f;
+}
+
+.console-title {
+    font-family: var(--font-code);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-left: 10px;
+}
+
+/* Skill Graph Container Constraints */
+.skill-graph-container {
+    position: relative;
+    width: 100%;
+    min-height: 400px;
+    margin-top: 2rem;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+/* SVG Line Layer */
+.skill-links-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    /* Let clicks pass to nodes */
+}
+
+/* Base Node Styles */
+.skill-node {
+    position: absolute;
+    z-index: 2;
+    padding: 0.8rem 1.5rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    color: #fff;
+    font-family: var(--font-heading);
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transform: translate(-50%, -50%);
+    /* Center based on absolute left/top */
+}
+
+.skill-node.type-lang {
+    border-color: rgba(0, 243, 255, 0.5);
+    /* Neon Blue */
+}
+
+.skill-node.type-fw {
+    border-color: rgba(255, 255, 255, 0.3);
+    /* Silver/White */
+}
+
+.skill-node.type-core {
+    border-color: rgba(157, 0, 255, 0.5);
+    /* Purple */
+}
+
+.skill-node.type-mobile {
+    border-color: rgba(255, 0, 157, 0.5);
+    /* Neon Pink */
+}
+
+.skill-node.type-db {
+    border-color: rgba(255, 189, 46, 0.5);
+    /* Amber/Yellowish */
+}
+
+.skill-node.type-ai-tool {
+    border-color: rgba(39, 201, 63, 0.5);
+    /* Bright Green */
+}
+
+/* Interactive States */
+.skill-graph-container.has-active-node .skill-node:not(.active) {
+    opacity: 0.15;
+    transform: translate(-50%, -50%) scale(0.9);
+}
+
+.skill-node.active {
+    box-shadow: 0 0 25px var(--neon-blue-glow);
+    border-color: var(--neon-blue);
+    background: rgba(0, 243, 255, 0.15);
+    transform: translate(-50%, -50%) scale(1.1);
+    z-index: 100;
+}
+
+/* SVG Line Styles */
+.skill-line {
+    stroke: rgba(255, 255, 255, 0.05);
+    stroke-width: 1.5;
+    transition: stroke 0.3s ease, stroke-width 0.3s ease, opacity 0.3s ease;
+}
+
+.skill-line.active {
+    stroke: var(--neon-purple);
+    stroke-width: 3;
+    opacity: 1;
+    filter: drop-shadow(0 0 8px var(--neon-purple));
+}
+
+/* Updated Node Positioning (25+ nodes) */
+[data-id="java"] {
+    top: 15%;
+    left: 20%;
+}
+
+[data-id="python"] {
+    top: 15%;
+    left: 50%;
+}
+
+[data-id="javascript"] {
+    top: 15%;
+    left: 80%;
+}
+
+[data-id="jsp"] {
+    top: 30%;
+    left: 10%;
+}
+
+[data-id="springboot"] {
+    top: 40%;
+    left: 25%;
+}
+
+[data-id="spring"] {
+    top: 55%;
+    left: 15%;
+}
+
+[data-id="nodejs"] {
+    top: 40%;
+    left: 50%;
+}
+
+[data-id="meteorjs"] {
+    top: 70%;
+    left: 50%;
+}
+
+[data-id="graphql"] {
+    top: 40%;
+    left: 75%;
+}
+
+[data-id="apollo"] {
+    top: 55%;
+    left: 85%;
+}
+
+[data-id="vuejs"] {
+    top: 75%;
+    left: 15%;
+}
+
+[data-id="reactjs"] {
+    top: 75%;
+    left: 35%;
+}
+
+[data-id="sveltejs"] {
+    top: 90%;
+    left: 25%;
+}
+
+[data-id="jquery"] {
+    top: 90%;
+    left: 10%;
+}
+
+[data-id="flutter"] {
+    top: 15%;
+    left: 35%;
+}
+
+[data-id="reactnative"] {
+    top: 85%;
+    left: 45%;
+}
+
+[data-id="expo"] {
+    top: 95%;
+    left: 45%;
+}
+
+[data-id="mysql"] {
+    top: 30%;
+    left: 40%;
+}
+
+[data-id="mariadb"] {
+    top: 30%;
+    left: 60%;
+}
+
+[data-id="oracle"] {
+    top: 45%;
+    left: 35%;
+}
+
+[data-id="mongodb"] {
+    top: 55%;
+    left: 55%;
+}
+
+[data-id="neo4j"] {
+    top: 65%;
+    left: 35%;
+}
+
+[data-id="n8n"] {
+    top: 25%;
+    left: 90%;
+}
+
+[data-id="flowise"] {
+    top: 10%;
+    left: 65%;
+}
+
+/* Timeline Cards & Horizontal Scroll Base */
+.projects-section {
+    overflow: hidden;
+    /* Important for horizontal scroll pinning */
+}
+
+.timeline-container {
+    width: 100%;
+    margin-top: 2rem;
+    /* Container will be pinned by GSAP */
+}
+
+.timeline-track {
+    display: flex;
+    gap: 3rem;
+    padding: 3rem 0;
+    width: max-content;
+    /* Let it grow horizontally */
+}
+
+.project-card {
+    width: 350px;
+    height: 400px;
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    /* Transition handled by Vanilla-tilt for transform, but add color transitions here */
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+    /* Specific glass overrides for cards */
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.project-card:hover {
+    box-shadow: 0 15px 35px rgba(0, 243, 255, 0.2);
+    border-color: rgba(0, 243, 255, 0.4);
+}
+
+.project-year {
+    color: var(--neon-purple);
+    font-family: var(--font-code);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px var(--neon-purple-glow);
+}
+
+.project-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.project-desc {
+    font-size: 1rem;
+    margin-bottom: 0;
+    color: #ccc;
+}
+
+/* Chat Container styling (Terminal Look) */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+    padding: 0;
+    /* Remove default padding for structural flexbox */
+}
+
+/* Scrollable History Area */
+.chat-history {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    /* Custom Scrollbar for chat */
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-blue) transparent;
+}
+
+.chat-history::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-history::-webkit-scrollbar-thumb {
+    background-color: var(--neon-blue);
+    border-radius: 10px;
+}
+
+/* Message Bubbles */
+.chat-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    max-width: 80%;
+    animation: fadeInMessage 0.4s ease-out forwards;
+    opacity: 0;
+    transform: translateY(10px);
+    z-index: 5;
+    /* Ensure above background */
+}
+
+@keyframes fadeInMessage {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chat-message.ai-message {
+    align-self: flex-start;
+}
+
+.chat-message.user-message {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.avatar {
+    font-family: var(--font-code);
+    font-weight: bold;
+    font-size: 0.8rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.ai-message .avatar {
+    color: var(--neon-blue);
+    border: 1px solid var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue-glow);
+}
+
+.user-message .avatar {
+    color: var(--text-primary);
+    border: 1px solid var(--text-secondary);
+}
+
+.message-bubble {
+    padding: 1rem;
+    border-radius: 8px;
+    background: rgba(15, 15, 15, 0.9);
+    /* Solider background for visibility */
+    border: 1px solid var(--glass-border);
+    font-size: 1rem;
+    line-height: 1.5;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    color: var(--text-primary);
+}
+
+.ai-message .message-bubble {
+    border-left: 3px solid var(--neon-blue);
+}
+
+.user-message .message-bubble {
+    border-right: 3px solid var(--neon-purple);
+    background: rgba(157, 0, 255, 0.1);
+}
+
+/* Chat Input Area (Fixed Bottom) */
+.chat-input-area {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: rgba(0, 0, 0, 0.4);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.prompt {
+    color: var(--neon-blue);
+    font-family: var(--font-code);
+    font-size: 1.2rem;
+    margin-right: 15px;
+    font-weight: bold;
+    animation: blink 1s infinite;
+}
+
+.chat-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 1.1rem;
+    outline: none;
+}
+
+.chat-input::placeholder {
+    color: var(--text-muted);
+}
+
+.ai-bubble-trigger {
+    width: 60px;
+    height: 60px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+    font-size: 1.5rem;
+}
+
+.ai-bubble-trigger:hover {
+    transform: scale(1.1);
+}
+
+.ai-chat-popup {
+    position: absolute;
+    bottom: 75px;
+    right: 0;
+    width: 300px;
+    height: 400px;
+    background: rgba(10, 10, 10, 0.98);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(20px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    box-shadow: var(--glass-shadow);
+}
+
+.ai-chat-popup.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+.ai-chat-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-chat-header h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--neon-blue);
+}
+
+.ai-chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ai-chat-input-container {
+    padding: 1rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.ai-chat-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    color: white;
+    outline: none;
+}
+
+/* Floating AI Assistant */
+.ai-assistant-widget {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 2000;
+    font-family: var(--font-heading);
+}
+
+.ai-bubble-trigger {
+    width: 65px;
+    height: 65px;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+    border: none;
+    outline: none;
+}
+
+.ai-bubble-trigger:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(157, 0, 255, 0.6);
+}
+
+.ai-bubble-trigger .icon {
+    font-size: 1.8rem;
+    color: white;
+}
+
+.ai-chat-popup {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 320px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    transform: translateY(20px);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    background: rgba(10, 10, 10, 0.95);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow: var(--glass-shadow);
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+.ai-chat-popup.active {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: all;
+}
+
+.ai-chat-header {
+    background: var(--bg-darker);
+    padding: 1rem;
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ai-chat-header h4 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--neon-blue);
+}
+
+.close-chat {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.ai-chat-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.ai-chat-input-container {
+    padding: 1rem;
+    background: var(--bg-darker);
+    border-top: 1px solid var(--glass-border);
+}
+
+.ai-chat-input {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    color: white;
+    outline: none;
+    font-size: 0.9rem;
+}

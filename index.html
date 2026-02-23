@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Portfolio | Hyper-connected</title>
+    <!-- Google Fonts: Outfit for tech feel, Inter for readability -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;600;800&display=swap"
+        rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <!-- Persistent Background Container -->
+    <div id="particle-canvas" class="background-canvas"></div>
+
+    <!-- Main Content Wrapper -->
+    <main class="app-container">
+
+        <!-- Section 1: Hero / Intro -->
+        <section id="hero" class="section hero-section">
+            <div class="glass-panel hero-content">
+                <p class="glitch-text code-font">> System Initialized...</p>
+                <h1 class="title">Hello, World.<br>I build <span class="text-gradient">intelligent</span> conversations.
+                </h1>
+                <p class="subtitle">2012년부터 AI와 인간을 잇는 시스템을 설계해 온 8년 차 개발자 <strong>Patrick</strong>입니다.</p>
+                <button class="btn-primary"
+                    onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
+                    Initialize Connection
+                </button>
+            </div>
+        </section>
+
+        <!-- Section 2: About Me & Skills -->
+        <section id="about" class="section about-section">
+            <h2 class="section-title">01. About & Skill Tree</h2>
+            <!-- Console / Dashboard UI -->
+            <div class="glass-panel console-container">
+                <div class="console-header">
+                    <span class="dot red"></span>
+                    <span class="dot yellow"></span>
+                    <span class="dot green"></span>
+                    <span class="console-title">user@ai-portfolio:~/skills</span>
+                </div>
+                <div class="console-body">
+                    <p class="code-font">> Analyzing capabilities...</p>
+
+                    <div class="profile-info"
+                        style="display: flex; gap: 2rem; align-items: center; margin-bottom: 2rem; flex-wrap: wrap;">
+                        <div class="profile-image"
+                            style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 2px solid var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue-glow); flex-shrink: 0; background: #0a0a0a; display: flex; align-items: center; justify-content: center; position: relative;">
+                            <!-- TODO: assets/images/profile.jpg에 실제 사진을 넣어주세요 -->
+                            <img src="assets/images/profile.jpg" alt="Patrick Profile"
+                                style="width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 2;"
+                                onerror="this.style.display='none'">
+                            <span
+                                style="position: absolute; font-family: var(--font-heading); color: var(--neon-blue); font-weight: 800; font-size: 1.5rem;">PATRICK</span>
+                        </div>
+                        <div class="profile-details">
+                            <h3
+                                style="color: var(--neon-purple); margin-bottom: 0.5rem; font-family: var(--font-code);">
+                                > Personal Profile</h3>
+                            <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 1.8;">
+                                <li><strong style="color: var(--text-primary);">Name:</strong> Patrick</li>
+                                <li><strong style="color: var(--text-primary);">BirthDate:</strong> [여기에 생년월일을 적어주세요]
+                                </li>
+                                <li><strong style="color: var(--text-primary);">Exp:</strong> 8년 차 (2012 ~ )</li>
+                            </ul>
+                            <p class="about-text" style="font-size: 0.95rem; margin-top: 1rem; color: #ccc;">복잡한 AI 로직을
+                                유저 친화적인 UX로 풀어내는 브릿지(Bridge) 역할을 수행합니다.</p>
+                        </div>
+                    </div>
+
+                    <!-- Skill Graph Area -->
+                    <div id="skill-graph" class="skill-graph-container">
+                        <!-- SVG Layer for Links -->
+                        <svg class="skill-links-svg" id="skill-links-svg"></svg>
+
+                        <!-- Skill Nodes (Massive Tech Stack) -->
+                        <!-- Languages -->
+                        <div class="skill-node type-lang" data-id="java" data-connects-to="spring,springboot,jsp">Java
+                        </div>
+                        <div class="skill-node type-lang" data-id="python" data-connects-to="flowise">Python</div>
+                        <div class="skill-node type-lang" data-id="javascript"
+                            data-connects-to="nodejs,vuejs,reactjs,sveltejs,jquery,meteorjs">JavaScript</div>
+                        <div class="skill-node type-lang" data-id="jsp" data-connects-to="java">JSP</div>
+
+                        <!-- Backend & Frameworks -->
+                        <div class="skill-node type-fw" data-id="springboot"
+                            data-connects-to="java,mysql,mariadb,oracle,mongodb">Spring Boot</div>
+                        <div class="skill-node type-fw" data-id="spring" data-connects-to="java">Spring</div>
+                        <div class="skill-node type-fw" data-id="nodejs" data-connects-to="javascript,mongodb,graphql">
+                            Node.js</div>
+                        <div class="skill-node type-fw" data-id="meteorjs" data-connects-to="javascript,mongodb">
+                            Meteor.js</div>
+                        <div class="skill-node type-fw" data-id="graphql" data-connects-to="apollo,nodejs">GraphQL</div>
+                        <div class="skill-node type-fw" data-id="apollo" data-connects-to="graphql">Apollo Server</div>
+
+                        <!-- Frontend -->
+                        <div class="skill-node type-fw" data-id="vuejs" data-connects-to="javascript">Vue.js</div>
+                        <div class="skill-node type-fw" data-id="reactjs" data-connects-to="javascript,reactnative">
+                            React.js</div>
+                        <div class="skill-node type-fw" data-id="sveltejs" data-connects-to="javascript">Svelte.js</div>
+                        <div class="skill-node type-fw" data-id="jquery" data-connects-to="javascript">jQuery</div>
+
+                        <!-- Mobile -->
+                        <div class="skill-node type-mobile" data-id="flutter" data-connects-to="">Flutter</div>
+                        <div class="skill-node type-mobile" data-id="reactnative" data-connects-to="reactjs,expo">React
+                            Native</div>
+                        <div class="skill-node type-mobile" data-id="expo" data-connects-to="reactnative">Expo</div>
+
+                        <!-- Databases -->
+                        <div class="skill-node type-db" data-id="mysql" data-connects-to="springboot">MySQL</div>
+                        <div class="skill-node type-db" data-id="mariadb" data-connects-to="springboot">MariaDB</div>
+                        <div class="skill-node type-db" data-id="oracle" data-connects-to="springboot">Oracle</div>
+                        <div class="skill-node type-db" data-id="mongodb" data-connects-to="nodejs,meteorjs">MongoDB
+                        </div>
+                        <div class="skill-node type-db" data-id="neo4j" data-connects-to="">Neo4j</div>
+
+                        <!-- AI & Tools -->
+                        <div class="skill-node type-ai-tool" data-id="n8n" data-connects-to="">n8n</div>
+                        <div class="skill-node type-ai-tool" data-id="flowise" data-connects-to="python">Flowise</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Projects Archive -->
+        <section id="projects" class="section projects-section">
+            <h2 class="section-title">02. Project Archives</h2>
+            <!-- Horizontal Timeline Container -->
+            <div class="timeline-container">
+                <div class="timeline-track">
+                    <!-- Project Cards (13 Real Projects) -->
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2012-2013</div>
+                        <h3 class="project-title">공정 자동화 설비</h3>
+                        <p class="project-desc">[㈜JBL]<br>C, PLC, Window 기반 개발</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2016</div>
+                        <h3 class="project-title">ABL 화상 고객 서비스</h3>
+                        <p class="project-desc">[ABL]<br>Java, MariaDB, MongoDB</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2016-2017</div>
+                        <h3 class="project-title">JB(전북은행) 통합 솔루션 구축</h3>
+                        <p class="project-desc">[전북은행]<br>Java, MariaDB, MongoDB</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2017-2019</div>
+                        <h3 class="project-title">AI 챗봇 솔루션 개발 및 구축</h3>
+                        <p class="project-desc">[롯데카드/우리카드/CJ오쇼핑]<br>Java, Meteor</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2021</div>
+                        <h3 class="project-title">㈜살방 구축 서비스</h3>
+                        <p class="project-desc">[플로리보스_살방]<br>JS, React Native, Expo, GraphQL, PostgreSQL</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2022-2023</div>
+                        <h3 class="project-title">AGING LOC Digital Healthcare App</h3>
+                        <p class="project-desc">[㈜메디아이오티]<br>Java, Flutter, Meteor</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2023-2024</div>
+                        <h3 class="project-title">STO 플랫폼 (ST Galaxia)</h3>
+                        <p class="project-desc">[㈜갤럭시아머니트리]<br>JS, jQuery, Java</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2024</div>
+                        <h3 class="project-title">SBL G.AI 문서표준화플랫폼 구축</h3>
+                        <p class="project-desc">[㈜삼성바이오로직스]<br>Java, Spring, Vue.js</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2024-2025</div>
+                        <h3 class="project-title">Gen AI 페르소나 자체 솔루션 개발</h3>
+                        <p class="project-desc">[페르소나 AI]<br>Java, Spring Boot, Vue.js</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2025</div>
+                        <h3 class="project-title">코닝정밀소재 AI 문서표준화</h3>
+                        <p class="project-desc">[페르소나 AI]<br>Java, Spring Boot, Vue.js</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2025</div>
+                        <h3 class="project-title">Keris 한국교육학술정보원</h3>
+                        <p class="project-desc">[페르소나 AI]<br>Java, Spring Boot, Vue.js</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2025</div>
+                        <h3 class="project-title">세라젬 LLM 챗봇 프로젝트</h3>
+                        <p class="project-desc">[페르소나 AI]<br>Java, Spring Boot, Vue.js</p>
+                    </div>
+                    <div class="project-card glass-panel" data-tilt>
+                        <div class="project-year">2025-2026</div>
+                        <h3 class="project-title">하나캐피탈 LLM 챗봇 프로젝트</h3>
+                        <p class="project-desc">[페르소나 AI]<br>Java, Spring Boot, JSP, jQuery</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Contact (Terminal Chat) -->
+        <section id="contact" class="section contact-section">
+            <h2 class="section-title">03. Establish Link</h2>
+            <div class="glass-panel chat-container">
+                <div class="chat-history" id="chat-history">
+                    <div class="chat-message ai-message">
+                        <span class="avatar">AI</span>
+                        <div class="message-bubble">연결이 수립되었습니다. 어떤 메시지를 남기시겠습니까?</div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <span class="prompt">></span>
+                    <input type="text" id="chat-input" class="chat-input" placeholder="메시지를 입력하세요 (Press Enter)..."
+                        autocomplete="off">
+                </div>
+            </div>
+        </section>
+
+        <!-- Floating AI Assistant Widget -->
+        <div class="ai-assistant-widget">
+            <button class="ai-bubble-trigger" id="ai-trigger" title="Patrick AI에게 물어보세요">🤖</button>
+            <div class="ai-chat-popup" id="ai-popup">
+                <div class="ai-chat-header">
+                    <h4>PATRICK AI Assistant</h4>
+                    <button class="close-chat" id="close-chat"
+                        style="background:none; border:none; color:#666; cursor:pointer; font-size:1.2rem;">&times;</button>
+                </div>
+                <div class="ai-chat-body" id="ai-chat-body">
+                    <div class="chat-message ai-message">
+                        <div class="message-bubble" style="font-size: 0.85rem;">안녕하세요! Patrick님의 8년 차 개발 여정에 대해 궁금한 점이
+                            있으신가요?</div>
+                    </div>
+                </div>
+                <div class="ai-chat-input-container">
+                    <input type="text" class="ai-chat-input" id="ai-chat-input" placeholder="질문을 입력하세요...">
+                </div>
+            </div>
+        </div>
+
+        <!-- GSAP & ScrollTrigger -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+        <!-- Vanilla Tilt (3D Cards) -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+
+        <!-- Particle Engine (tsParticles) -->
+        <script src="https://cdn.jsdelivr.net/npm/tsparticles-slim@2.0.6/tsparticles.slim.bundle.min.js"></script>
+
+        <!-- EmailJS SDK (SMTP Bridge) -->
+        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+        <!-- Core Scripts -->
+        <script src="js/main.js"></script>
+</body>
+
+</html>
