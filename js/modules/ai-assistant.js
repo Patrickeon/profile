@@ -78,21 +78,30 @@ export function initAIAssistant(supabase) {
         if (isModelLoading) return null;
 
         isModelLoading = true;
-        const loader = createLoader('매칭 중: On-Device Model (SmolLM-135M)...');
+        const loader = createLoader('매칭 중: On-Device Model (Qwen-0.5B)...');
         statusText.innerText = "Status: Loading Local AI Engine...";
 
         try {
-            // 초소형 모델 로드 (SmolLMv2 135M) - 공식 ONNX 커뮤니티 경로로 수정
-            generator = await pipeline('text-generation', 'onnx-community/SmolLM2-135M-Instruct-ONNX');
+            // v2 환경에서 가장 안정적인 Qwen 0.5B Chat 모델 로드 (양자화 버전)
+            // 약 350MB 정도이며, 한국어 성능이 준수합니다.
+            generator = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
+                quantized: true,
+                progress_callback: (p) => {
+                    if (p.status === 'progress') {
+                        statusText.innerText = `Status: Downloading... ${p.progress.toFixed(1)}%`;
+                    }
+                }
+            });
             loader.remove();
-            addChatMessage('AI', "시스템 연결 완료. 이제 서버 없이도 대화가 가능합니다! (On-Device Mode 활성화)");
+            addChatMessage('AI', "시스템 연결 완료. 이제 서버 없이도 대화가 가능합니다! (Qwen Local Mode)");
             statusText.innerText = "Status: On-Device AI Active (Keyless)";
             isModelLoading = false;
             return generator;
         } catch (err) {
             console.error('On-Device Model Load Error:', err);
             loader.remove();
-            addChatMessage('AI', "로컬 모델 로드에 실패했습니다. API 키 모드를 권장합니다.");
+            addChatMessage('AI', "로컬 모델 로드에 실패했습니다. (WebGPU 미지원 또는 네트워크 오류)");
+            statusText.innerText = "Status: On-Device Load Failed";
             isModelLoading = false;
             return null;
         }
@@ -108,12 +117,19 @@ export function initAIAssistant(supabase) {
             console.log('[AI] Running in On-Device (Keyless) Mode');
             const localGen = await loadOnDeviceModel();
             if (localGen) {
-                const output = await localGen(userQuery, {
-                    max_new_tokens: 128,
+                // Qwen Chat 포맷에 맞게 프롬프트 구성
+                const prompt = `<|im_start|>user\n${userQuery}<|im_end|>\n<|im_start|>assistant\n`;
+                const output = await localGen(prompt, {
+                    max_new_tokens: 256,
                     temperature: 0.7,
-                    repetition_penalty: 1.2
+                    repetition_penalty: 1.1,
+                    do_sample: true
                 });
-                return output[0].generated_text;
+
+                // 결과에서 프롬프트 제외하고 답변만 추출
+                const fullText = output[0].generated_text;
+                const response = fullText.split('assistant\n').pop().trim();
+                return response || fullText;
             }
             return "On-Device 모델 로딩 중입니다. 잠시만 기다려 주세요...";
         }
