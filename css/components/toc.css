@@ -1,0 +1,84 @@
+/* --- Floating Table of Contents (TOC) Styles --- */
+/* 목차 사이드바 컨테이너: 화면 우측 중앙에 고정 */
+.toc-sidebar {
+    position: fixed;
+    right: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 100;
+    /* AI 위젯보다는 낮지만 일반 요소보다는 높게 설정 */
+}
+
+/* 목차 리스트 스타일 */
+.toc-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* 목차 개별 항목: 아이콘(점)과 라벨 포함 */
+.toc-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* 목차의 점(Dot) 스타일 */
+.toc-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s ease;
+}
+
+/* 목차 섹션 이름(Label) 스타일: 평소에는 숨김 상태 */
+.toc-label {
+    font-family: var(--font-code);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+/* 호버 시 또는 활성화된 섹션일 때 라벨 표시 */
+.toc-item:hover .toc-label,
+.toc-item.active .toc-label {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 호버 시 또는 활성화된 섹션일 때 점 강조(네온 효과) */
+.toc-item:hover .toc-dot,
+.toc-item.active .toc-dot {
+    background: var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue-glow);
+    transform: scale(1.5);
+}
+
+/* 활성 섹션 라벨 색상 강조 */
+.toc-item.active .toc-label {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+/* 모바일 환경 대응: 작은 화면에서는 목차 숨김 또는 간소화 가능 */
+@media (max-width: 1024px) {
+    .toc-sidebar {
+        right: 1rem;
+    }
+
+    .toc-label {
+        display: none;
+        /* 모바일에서는 점만 표시 */
+    }
+}

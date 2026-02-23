@@ -4,7 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Portfolio | Hyper-connected</title>
+    <title>Patrick | Full-Stack AI Engineer Portfolio</title>
+    <meta name="description" content="8년 차 개발자 Patrick의 포트폴리오입니다. AI, LLM, Web 개발 프로젝트와 기술 스택을 확인해 보세요.">
+    <meta name="keywords" content="개발자 포트폴리오, Full-Stack, AI Engineer, LLM, RAG, Patrick, 김건훈">
+
+    <!-- Open Graph / Social Media -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Patrick | Full-Stack AI Engineer Portfolio">
+    <meta property="og:description" content="Complex AI logic, User-friendly UX. Patrick의 프로젝트 아카이브를 탐험해 보세요.">
+    <meta property="og:image" content="assets/profile.jpg">
     <!-- Google Fonts: Outfit for tech feel, Inter for readability -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,11 +21,42 @@
         rel="stylesheet">
     <!-- Main Stylesheet -->
     <link rel="stylesheet" href="css/style.css">
+
+    <!-- Modular Components CSS -->
+    <link rel="stylesheet" href="css/components/toc.css">
+    <link rel="stylesheet" href="css/components/board.css">
+    <link rel="stylesheet" href="css/components/ai-assistant.css">
 </head>
 
 <body>
     <!-- Persistent Background Container -->
     <div id="particle-canvas" class="background-canvas"></div>
+
+    <!-- Floating Table of Contents (TOC) -->
+    <nav class="toc-sidebar">
+        <ul class="toc-list">
+            <li class="toc-item active" data-section="hero">
+                <span class="toc-dot"></span>
+                <span class="toc-label">00. LOGON</span>
+            </li>
+            <li class="toc-item" data-section="about">
+                <span class="toc-dot"></span>
+                <span class="toc-label">01. ABOUT</span>
+            </li>
+            <li class="toc-item" data-section="projects">
+                <span class="toc-dot"></span>
+                <span class="toc-label">02. TIMELINE</span>
+            </li>
+            <li class="toc-item" data-section="project-board">
+                <span class="toc-dot"></span>
+                <span class="toc-label">03. ARCHIVE</span>
+            </li>
+            <li class="toc-item" data-section="contact">
+                <span class="toc-dot"></span>
+                <span class="toc-label">04. CONTACT</span>
+            </li>
+        </ul>
+    </nav>
 
     <!-- Main Content Wrapper -->
     <main class="app-container">
@@ -28,7 +67,7 @@
                 <p class="glitch-text code-font">> System Initialized...</p>
                 <h1 class="title">Hello, World.<br>I build <span class="text-gradient">intelligent</span> conversations.
                 </h1>
-                <p class="subtitle">2012년부터 AI와 인간을 잇는 시스템을 설계해 온 8년 차 개발자 <strong>Patrick</strong>입니다.</p>
+                <p class="subtitle">2016년부터 AI와 인간을 잇는 시스템을 설계해 온 8년 차 개발자 <strong>Patrick</strong>입니다.</p>
                 <button class="btn-primary"
                     onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
                     Initialize Connection
@@ -53,10 +92,10 @@
                     <div class="profile-info"
                         style="display: flex; gap: 2rem; align-items: center; margin-bottom: 2rem; flex-wrap: wrap;">
                         <div class="profile-image"
-                            style="width: 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 2px solid var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue-glow); flex-shrink: 0; background: #0a0a0a; display: flex; align-items: center; justify-content: center; position: relative;">
+                            style="width: 150px; height: 170px; border-radius: 50%; overflow: hidden; border: 2px solid var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue-glow); flex-shrink: 0; background: #0a0a0a; display: flex; align-items: center; justify-content: center; position: relative;">
                             <!-- TODO: assets/images/profile.jpg에 실제 사진을 넣어주세요 -->
                             <img src="assets/images/profile.jpg" alt="Patrick Profile"
-                                style="width: 100%; height: 100%; object-fit: cover; position: relative; z-index: 2;"
+                                style="width: 100%; height: 100%; object-fit: cover; object-position: center 20%; position: relative; z-index: 2;"
                                 onerror="this.style.display='none'">
                             <span
                                 style="position: absolute; font-family: var(--font-heading); color: var(--neon-blue); font-weight: 800; font-size: 1.5rem;">PATRICK</span>
@@ -66,10 +105,10 @@
                                 style="color: var(--neon-purple); margin-bottom: 0.5rem; font-family: var(--font-code);">
                                 > Personal Profile</h3>
                             <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 1.8;">
-                                <li><strong style="color: var(--text-primary);">Name:</strong> Patrick</li>
-                                <li><strong style="color: var(--text-primary);">BirthDate:</strong> [여기에 생년월일을 적어주세요]
+                                <li><strong style="color: var(--text-primary);">Name:</strong> 김건훈</li>
+                                <li><strong style="color: var(--text-primary);">BirthDate:</strong> 1994.01.20
                                 </li>
-                                <li><strong style="color: var(--text-primary);">Exp:</strong> 8년 차 (2012 ~ )</li>
+                                <li><strong style="color: var(--text-primary);">Exp:</strong> 8년 차 (2016 ~ 2026)</li>
                             </ul>
                             <p class="about-text" style="font-size: 0.95rem; margin-top: 1rem; color: #ccc;">복잡한 AI 로직을
                                 유저 친화적인 UX로 풀어내는 브릿지(Bridge) 역할을 수행합니다.</p>
@@ -206,6 +245,27 @@
             </div>
         </section>
 
+        <!-- Section 3-B: Project Board (Grid System) -->
+        <section id="project-board" class="section project-board-section">
+            <h2 class="section-title">02-B. Knowledge Base & Project Hub</h2>
+            <div class="glass-panel board-container">
+                <div class="board-header">
+                    <div class="filter-tabs">
+                        <button class="filter-btn active" data-filter="all">ALL</button>
+                        <button class="filter-btn" data-filter="ai">AI / LLM</button>
+                        <button class="filter-btn" data-filter="web">WEB / APP</button>
+                        <button class="filter-btn" data-filter="system">SYSTEM</button>
+                    </div>
+                    <div class="board-search">
+                        <input type="text" id="board-search-input" placeholder="Search archive...">
+                    </div>
+                </div>
+                <div class="project-grid" id="project-grid">
+                    <!-- Cards will be dynamically injected here via JS -->
+                </div>
+            </div>
+        </section>
+
         <!-- Section 4: Contact (Terminal Chat) -->
         <section id="contact" class="section contact-section">
             <h2 class="section-title">03. Establish Link</h2>
@@ -229,7 +289,10 @@
             <button class="ai-bubble-trigger" id="ai-trigger" title="Patrick AI에게 물어보세요">🤖</button>
             <div class="ai-chat-popup" id="ai-popup">
                 <div class="ai-chat-header">
-                    <h4>PATRICK AI Assistant</h4>
+                    <div>
+                        <h4>PATRICK AI Assistant</h4>
+                        <span class="status-indicator">Multimodal Mode (Text/Image/Music)</span>
+                    </div>
                     <button class="close-chat" id="close-chat"
                         style="background:none; border:none; color:#666; cursor:pointer; font-size:1.2rem;">&times;</button>
                 </div>
@@ -258,8 +321,11 @@
         <!-- EmailJS SDK (SMTP Bridge) -->
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
-        <!-- Core Scripts -->
-        <script src="js/main.js"></script>
+        <!-- Supabase JS Client -->
+        <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+        <!-- Core Modular Scripts (Entry Point) -->
+        <script type="module" src="js/main-modular.js"></script>
 </body>
 
 </html>

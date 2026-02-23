@@ -1,0 +1,187 @@
+/* --- Project Board (Archive) Styles --- */
+
+/* 게시판 섹션 기본 정렬 */
+.project-board-section {
+    align-items: stretch;
+}
+
+/* 게시판 컨테이너: 글래스모피즘 패널 적용 */
+.board-container {
+    padding: 2.5rem;
+    min-height: 600px;
+    margin-top: 1rem;
+}
+
+/* 헤더: 필터 탭과 검색창 배치 */
+.board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+
+/* 카테고리 필터 버튼 탭 */
+.filter-tabs {
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* 개별 필터 버튼 스타일 */
+.filter-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    color: var(--text-secondary);
+    padding: 0.5rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-code);
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+/* 필터 버튼 호버 및 활성화 상태 */
+.filter-btn:hover,
+.filter-btn.active {
+    background: var(--neon-blue-glow);
+    border-color: var(--neon-blue);
+    color: var(--text-primary);
+    box-shadow: 0 0 10px var(--neon-blue-glow);
+}
+
+/* 검색 입력창 스타일 */
+.board-search input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--glass-border);
+    color: var(--text-primary);
+    padding: 0.6rem 1.2rem;
+    border-radius: 20px;
+    width: 250px;
+    outline: none;
+    font-family: var(--font-body);
+    transition: all 0.3s ease;
+}
+
+/* 검색창 포커스 시 네온 퍼플 강조 */
+.board-search input:focus {
+    border-color: var(--neon-purple);
+    box-shadow: 0 0 10px var(--neon-purple-glow);
+}
+
+/* 프로젝트 카드 그리드 레이아웃 (반응형) */
+.project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+/* 개별 프로젝트 카드 스타일 */
+.board-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.8rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* 카드 상단 네온 라디언트 바 */
+.board-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--gradient-primary);
+    opacity: 0.4;
+    transition: opacity 0.3s ease;
+}
+
+/* 카드 호버 시 애니메이션 효과 */
+.board-card:hover {
+    transform: translateY(-8px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--neon-blue);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+}
+
+.board-card:hover::before {
+    opacity: 1;
+}
+
+/* 카드 내부 태그 (기술 스택/분류) */
+.card-tag {
+    font-family: var(--font-code);
+    font-size: 0.75rem;
+    color: var(--neon-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* 카드 제목 */
+.card-title {
+    font-size: 1.4rem;
+    margin: 0;
+    color: white;
+    font-family: var(--font-heading);
+}
+
+/* 카드 설명 */
+.card-desc {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* 카드 하단 정보 영역 */
+.card-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* 프로젝트 날짜/기간 */
+.card-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-family: var(--font-code);
+}
+
+/* 상세보기 버튼 스타일 */
+.read-more {
+    color: var(--neon-purple);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.read-more:hover {
+    color: var(--neon-blue);
+    text-shadow: 0 0 5px var(--neon-blue-glow);
+}
+
+/* 모바일 반응형 조정 */
+@media (max-width: 768px) {
+    .board-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .board-search input {
+        width: 100%;
+    }
+
+    .project-grid {
+        grid-template-columns: 1fr;
+    }
+}
