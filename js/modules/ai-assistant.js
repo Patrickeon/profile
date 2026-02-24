@@ -266,7 +266,7 @@ export function initAIAssistant(supabase) {
         try {
             // 💡 핵심: responseType을 'blob'으로 지정하여 바이너리 데이터를 명확히 요청합니다.
             const { data, error } = await supabase.functions.invoke('ai-proxy', {
-                body: { type: type, prompt: prompt },
+                body: { type, prompt },
                 responseType: 'blob'
             });
 
@@ -281,28 +281,47 @@ export function initAIAssistant(supabase) {
                 throw new Error(errorMsg);
             }
 
-            // 💡 데이터가 Blob인지 한 번 더 검증하고, 아니라면 변환을 시도합니다.
-            let mediaBlob = data;
+            // 2. 강제로 Blob 생성
+            const finalBlob = new Blob([data], { type: type === 'image' ? 'image/jpeg' : 'audio/mpeg' });
+            console.log(`[System] 가벼운 모델로부터 ${finalBlob.size} 바이트 수신 성공.`);
 
-            if (!(data instanceof Blob)) {
-                console.warn("[System] 데이터가 Blob 형식이 아닙니다. 변환을 시도합니다.");
-                // 문자열이나 ArrayBuffer로 왔을 경우를 대비해 다시 Blob으로 감쌉니다.
-                mediaBlob = new Blob([data], { type: type === 'image' ? 'image/jpeg' : 'audio/mpeg' });
-            }
+            // 3. 404가 절대 날 수 없는 Base64(Data URL)로 변환
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(finalBlob);
+            });
 
-            // 💡 크기가 NaN이 나오지 않도록 확인
-            const sizeKB = (mediaBlob.size / 1024).toFixed(1);
-            console.log(`[System] 수신 완료. 실제 크기: ${sizeKB} KB`);
+            // 2. 💡 [핵심] 수신된 데이터를 강제로 Blob으로 만듭니다. 
+            // ArrayBuffer로 왔든, 이미 Blob이든 상관없이 이 코드가 처리합니다.
+            // const finalBlob = new Blob([data], { type: type === 'image' ? 'image/png' : 'audio/mpeg' });
 
-            if (mediaBlob.size < 100) {
-                throw new Error("수신된 미디어 파일이 너무 작거나 유효하지 않습니다.");
-            }
+            // console.log(`[System] 데이터 확보 완료 (크기: ${finalBlob.size} 바이트)`);
 
-            // 💡 이제 안전하게 URL을 생성합니다.
-            const objectUrl = URL.createObjectURL(mediaBlob);
-            console.log(`[System] 생성된 URL: ${objectUrl}`);
+            // // 3. FileReader를 통해 404 에러가 절대 날 수 없는 Data URL로 변환합니다.
+            // return new Promise((resolve, reject) => {
+            //     const reader = new FileReader();
 
-            return objectUrl;
+            //     reader.onloadend = () => {
+            //         const base64Data = reader.result;
+            //         // 변환된 데이터가 너무 짧으면 이미지 생성 실패로 간주
+            //         if (base64Data.length < 500) {
+            //             reject(new Error("데이터가 너무 작아 정상적인 이미지로 변환할 수 없습니다."));
+            //         } else {
+            //             console.log(`[System] Base64 변환 성공. 주소 생성 완료.`);
+            //             resolve(base64Data);
+            //         }
+            //     };
+
+            //     reader.onerror = () => {
+            //         console.error("[System] FileReader 에러 발생");
+            //         reject(new Error("바이너리 데이터를 읽는 중 오류가 발생했습니다."));
+            //     };
+
+            //     // 이제 finalBlob은 확실히 Blob 타입이므로 에러가 나지 않습니다.
+            //     reader.readAsDataURL(finalBlob);
+            // });
 
         } catch (err) {
             // 8년 차 개발자답게 에러의 정체를 명확히 출력

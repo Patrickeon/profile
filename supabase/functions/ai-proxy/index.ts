@@ -40,7 +40,7 @@ serve(async (req) => {
     // 4. 미디어 생성 (Hugging Face - Router API 적용)
     if (type === 'image' || type === 'music') {
       const modelId = type === 'image' 
-        ? 'stabilityai/stable-diffusion-xl-base-1.0' 
+        ? 'runwayml/stable-diffusion-v1-5' 
         : 'facebook/musicgen-small';
 
       // 💡 [핵심 변경] 구형 주소 대신 신형 Router 주소를 사용합니다.
@@ -64,11 +64,29 @@ serve(async (req) => {
         });
       }
 
-      // 바이너리 데이터 수신 및 반환
-      const arrayBuffer = await response.arrayBuffer();
-      return new Response(arrayBuffer, {
-        headers: { ...corsHeaders, "Content-Type": type === 'image' ? "image/png" : "audio/mpeg" }
+      const buffer = await response.arrayBuffer();
+      // 💡 데이터가 너무 작으면 에러로 간주
+      if (buffer.byteLength < 1000) throw new Error("수신된 데이터가 너무 작습니다.");
+
+      return new Response(new Uint8Array(buffer), {
+        headers: { 
+          ...corsHeaders, 
+          "Content-Type": type === 'image' ? "image/jpeg" : "audio/mpeg",
+          "Content-Length": buffer.byteLength.toString()
+        }
       });
+
+      // 💡 [변경] ArrayBuffer를 Uint8Array로 감싸서 응답의 무결성을 보장합니다.
+      // const arrayBuffer = await response.arrayBuffer();
+      // const uint8Array = new Uint8Array(arrayBuffer);
+
+      // return new Response(uint8Array, {
+      //   headers: { 
+      //     ...corsHeaders, 
+      //     "Content-Type": type === 'image' ? "image/png" : "audio/mpeg", // 💡 png로 명시 권장
+      //     "Content-Length": uint8Array.length.toString()
+      //   }
+      // });
     }
 
   } catch (error) {
