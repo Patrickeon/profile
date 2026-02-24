@@ -28,7 +28,7 @@ export function initAIAssistant(supabase) {
         aiWorker.onmessage = (e) => {
             const { type, data } = e.data;
             if (type === 'progress') {
-                if (data.status === 'progress') {
+                if (data && data.status === 'progress' && data.progress !== undefined) {
                     statusText.innerText = `Status: Downloading... ${data.progress.toFixed(1)}%`;
                 }
             } else if (type === 'ready') {
@@ -38,7 +38,8 @@ export function initAIAssistant(supabase) {
                 document.dispatchEvent(new CustomEvent('ai-model-ready'));
             } else if (type === 'error') {
                 statusText.innerText = "Status: Worker Error";
-                console.error('Worker Error:', data);
+                const errorMessage = data === undefined ? 'No error details received' : (typeof data === 'string' ? data : JSON.stringify(data));
+                console.error('Worker Error:', errorMessage);
             }
         };
     }
