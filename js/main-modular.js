@@ -10,14 +10,15 @@ import { initContact } from './modules/contact.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Supabase 초기화 구성
-    const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
-    const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+    const SUPABASE_URL = 'https://jviurhfueipyhiangwpv.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2aXVyaGZ1ZWlweWhpYW5nd3B2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5NDQwMjYsImV4cCI6MjA4NzUyMDAyNn0.PYtPJcQDtsrkPbpxNNxeMLUaTB5xv_t_CI0GO4NPOO0';
 
     let supabaseClient = null;
-    // 글로벌 supabase 객체 확인 (SDK 로드 시 window.supabase에 할당됨)
-    if (typeof window.supabase !== 'undefined' && SUPABASE_URL !== 'YOUR_SUPABASE_PROJECT_URL') {
+    // 3. 브라우저용 SDK 초기화 (공식 문서의 createClient와 동일한 역할)
+    if (typeof window.supabase !== 'undefined') {
+        // 외부 let 변수에 할당하여 전역적으로 사용 가능하게 함
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log('[System] Secure Database Connection Established.');
+        console.log('[System] Supabase Client Initialized:', supabaseClient);
     }
 
     // 2. 각 기능 모듈 통합 초기화
@@ -30,6 +31,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 프로젝트 보드 (Archive) - DB 데이터 및 WEB 보강 버전
         await initProjectBoard(supabaseClient);
+
+        console.log('====================== ', supabase);
 
         // AI 비서 위젯 (Chatbot)
         initAIAssistant(supabaseClient);

@@ -192,3 +192,31 @@
     font-family: var(--font-code);
     margin-top: 2px;
 }
+
+/* --- AI Suggestion Chips (추천 질문 버튼) --- */
+.suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    animation: fadeInMessage 0.6s ease-out forwards;
+}
+
+.suggestion-chip {
+    background: rgba(0, 243, 255, 0.05);
+    border: 1px solid rgba(0, 243, 255, 0.4);
+    color: var(--text-primary);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-body);
+}
+
+.suggestion-chip:hover {
+    background: rgba(0, 243, 255, 0.2);
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue-glow);
+    transform: translateY(-2px);
+}
