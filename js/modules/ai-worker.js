@@ -4,8 +4,11 @@
  */
 import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 
-// CDN 환경 설정
+// CDN 및 모델 접근 설정 최적화
 env.allowLocalModels = false;
+env.useBrowserCache = true;
+// HuggingFace 접근 에러 해결을 위해 커스텀 호스트 설정 고려 가능 (필요시)
+// env.remoteHost = 'https://huggingface.co'; 
 
 let generator = null;
 
@@ -16,7 +19,8 @@ self.onmessage = async (e) => {
     if (type === 'load') {
         try {
             if (!generator) {
-                generator = await pipeline('text-generation', 'Xenova/SmolLM2-135M-Instruct', {
+                // 더 작고 안정적인 모델로 변경 (Qwen 시리즈는 더 최신 ONNX 최적화가 잘 되어 있음)
+                generator = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
                     quantized: true,
                     progress_callback: (progress) => {
                         self.postMessage({ type: 'progress', data: progress });
@@ -25,7 +29,17 @@ self.onmessage = async (e) => {
             }
             self.postMessage({ type: 'ready' });
         } catch (err) {
-            self.postMessage({ type: 'error', data: err.message });
+            console.error('Worker Model Load Error:', err);
+            // 만약 Qwen도 실패하면 가장 가벼운 GPT-2로 폴백
+            try {
+                generator = await pipeline('text-generation', 'Xenova/gpt2', {
+                    quantized: true,
+                    progress_callback: (p) => self.postMessage({ type: 'progress', data: p })
+                });
+                self.postMessage({ type: 'ready' });
+            } catch (innerErr) {
+                self.postMessage({ type: 'error', data: `Critical Load Failed: ${innerErr.message}` });
+            }
         }
     }
 
@@ -36,23 +50,24 @@ self.onmessage = async (e) => {
         }
 
         try {
-            // SmolLM2 전용 프롬프트 템플릿 적용
-            const prompt = `<|im_start|>user\n${text}<|im_end|>\n<|im_start|>assistant\n`;
+            // 모델에 맞는 프롬프트 템플릿 처리 (Qwen 기준)
+            let prompt = text;
+            if (generator.model_id.includes('Qwen')) {
+                prompt = `<|im_start|>user\n${text}<|im_end|>\n<|im_start|>assistant\n`;
+            }
 
             const output = await generator(prompt, {
-                max_new_tokens: options?.max_new_tokens || 256,
+                max_new_tokens: options?.max_new_tokens || 128, // 속도를 위해 토큰 수 제한
                 temperature: options?.temperature || 0.7,
-                repetition_penalty: 1.1,
                 do_sample: true,
-                callback_function: (beams) => {
-                    // 선택 사항: 스트리밍 구현 시 사용 가능
-                }
             });
 
-            const fullText = output[0].generated_text;
-            const response = fullText.split('assistant\n').pop().trim();
+            let response = output[0].generated_text;
+            if (response.includes('assistant\n')) {
+                response = response.split('assistant\n').pop().trim();
+            }
 
-            self.postMessage({ type: 'result', data: response || fullText });
+            self.postMessage({ type: 'result', data: response });
         } catch (err) {
             self.postMessage({ type: 'error', data: err.message });
         }

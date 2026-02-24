@@ -184,9 +184,9 @@ function initHorizontalScroll() {
 
             // ScrollTrigger 설정: 섹션 고정 및 애니메이션 바인딩
             const st = ScrollTrigger.create({
-                trigger: ".projects-section",
+                trigger: "#projects", // .projects-section 대신 구체적인 ID 사용
                 start: "top top",
-                end: () => `+=${timelineTrack.scrollWidth}`,
+                end: () => `+=${timelineTrack.scrollWidth * 0.5}`, // 더 빨리 끝나게 조정
                 pin: true,
                 animation: horizontalTween,
                 scrub: 1,
@@ -202,8 +202,11 @@ function initHorizontalScroll() {
                 if ((progress > 0 && progress < 1) || (progress === 0 && e.deltaY > 0) || (progress === 1 && e.deltaY < 0)) {
                     // 기본 스크롤을 막고 수동으로 스크롤 위치를 조정하여 ScrollTrigger를 구동
                     e.preventDefault();
+
+                    // 스크롤 속도 최적화: deltaY를 직접 사용하되, 너무 느리면 배율 조정 가능 (현재는 1.0)
+                    const scrollMultiplier = 3.0; // 속도를 대폭 상향
                     window.scrollBy({
-                        top: e.deltaY,
+                        top: e.deltaY * scrollMultiplier,
                         behavior: 'auto'
                     });
                 }
