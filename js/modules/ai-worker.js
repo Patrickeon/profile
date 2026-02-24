@@ -19,8 +19,8 @@ self.onmessage = async (e) => {
     if (type === 'load') {
         try {
             if (!generator) {
-                // 더 작고 안정적인 모델로 변경 (Qwen 시리즈는 더 최신 ONNX 최적화가 잘 되어 있음)
-                generator = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
+                // Start with the smallest, most reliable model (GPT-2) to potentially avoid large downloads/warnings first
+                generator = await pipeline('text-generation', 'Xenova/gpt2', {
                     quantized: true,
                     progress_callback: (progress) => {
                         self.postMessage({ type: 'progress', data: progress });
@@ -29,10 +29,10 @@ self.onmessage = async (e) => {
             }
             self.postMessage({ type: 'ready' });
         } catch (err) {
-            console.error('Worker Model Load Error:', err);
-            // 만약 Qwen도 실패하면 가장 가벼운 GPT-2로 폴백
+            console.error('Worker GPT2 Load Error:', err);
+            // If GPT2 fails, attempt the preferred, larger Qwen model as a secondary option (may cause warning)
             try {
-                generator = await pipeline('text-generation', 'Xenova/gpt2', {
+                generator = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
                     quantized: true,
                     progress_callback: (p) => self.postMessage({ type: 'progress', data: p })
                 });
