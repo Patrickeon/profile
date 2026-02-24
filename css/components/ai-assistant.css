@@ -160,15 +160,26 @@
 }
 
 .ai-spinner {
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
     border: 2px solid rgba(0, 243, 255, 0.1);
     border-top-color: var(--neon-blue);
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+.loading-msg .message-bubble {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px dashed var(--neon-blue);
+    opacity: 0.8;
 }
 
 @keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
     to {
         transform: rotate(360deg);
     }

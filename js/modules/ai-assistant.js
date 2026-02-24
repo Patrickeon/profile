@@ -4,11 +4,6 @@
  * 2. Offline Mode (On-Device): Transformers.js 기반 브라우저 내 구동 (API 키 불필요)
  */
 
-import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
-
-// CDN 환경에서 로컬 경로 대신 HF 허브 사용 설정
-env.allowLocalModels = false;
-
 export function initAIAssistant(supabase) {
     const aiTrigger = document.getElementById('ai-trigger');
     const aiPopup = document.getElementById('ai-popup');
@@ -19,14 +14,41 @@ export function initAIAssistant(supabase) {
 
     if (!aiTrigger || !aiPopup) return;
 
-    let generator = null; // On-Device 모델 인스턴스
+    let aiWorker = null;
     let isModelLoading = false;
+    let modelReady = false;
+
+    // Web Worker 초기화
+    function initWorker() {
+        if (aiWorker) return;
+
+        // 현재 스크립트 위치 기준으로 워커 경로 설정
+        aiWorker = new Worker(new URL('./ai-worker.js', import.meta.url), { type: 'module' });
+
+        aiWorker.onmessage = (e) => {
+            const { type, data } = e.data;
+            if (type === 'progress') {
+                if (data.status === 'progress') {
+                    statusText.innerText = `Status: Downloading... ${data.progress.toFixed(1)}%`;
+                }
+            } else if (type === 'ready') {
+                modelReady = true;
+                statusText.innerText = "Status: On-Device AI Active (Lightweight)";
+                // 로딩 메시지 제거 로직은 호출부에서 처리
+                document.dispatchEvent(new CustomEvent('ai-model-ready'));
+            } else if (type === 'error') {
+                statusText.innerText = "Status: Worker Error";
+                console.error('Worker Error:', data);
+            }
+        };
+    }
 
     // 팝업 열기/닫기
     aiTrigger.addEventListener('click', () => {
         aiPopup.classList.toggle('active');
         if (aiPopup.classList.contains('active')) {
             aiChatInput.focus();
+            if (!aiWorker) initWorker();
         }
     });
 
@@ -45,7 +67,6 @@ export function initAIAssistant(supabase) {
         } else if (type === 'audio') {
             content = `<div class="message-bubble"><audio controls class="ai-audio-player"><source src="${text}" type="audio/mpeg"></audio></div>`;
         } else {
-            // 줄바꿈 보존
             content = `<div class="message-bubble">${text.replace(/\n/g, '<br>')}</div>`;
         }
 
@@ -71,70 +92,57 @@ export function initAIAssistant(supabase) {
     }
 
     /**
-     * [핵심] On-Device AI 모델 로드 (최초 호출 시 실행)
+     * [최초 실행] On-Device 모델 로드 요청
      */
     async function loadOnDeviceModel() {
-        if (generator) return generator;
-        if (isModelLoading) return null;
+        if (modelReady) return true;
+        if (isModelLoading) return false;
 
         isModelLoading = true;
-        const loader = createLoader('매칭 중: On-Device Model (Qwen-0.5B)...');
-        statusText.innerText = "Status: Loading Local AI Engine...";
+        const loader = createLoader('최적화된 로컬 모델 매칭 중 (SmolLM2-135M)...');
+        statusText.innerText = "Status: Initializing AI Engine...";
 
-        try {
-            // v2 환경에서 가장 안정적인 Qwen 0.5B Chat 모델 로드 (양자화 버전)
-            // 약 350MB 정도이며, 한국어 성능이 준수합니다.
-            generator = await pipeline('text-generation', 'Xenova/Qwen1.5-0.5B-Chat', {
-                quantized: true,
-                progress_callback: (p) => {
-                    if (p.status === 'progress') {
-                        statusText.innerText = `Status: Downloading... ${p.progress.toFixed(1)}%`;
-                    }
-                }
-            });
-            loader.remove();
-            addChatMessage('AI', "시스템 연결 완료. 이제 서버 없이도 대화가 가능합니다! (Qwen Local Mode)");
-            statusText.innerText = "Status: On-Device AI Active (Keyless)";
-            isModelLoading = false;
-            return generator;
-        } catch (err) {
-            console.error('On-Device Model Load Error:', err);
-            loader.remove();
-            addChatMessage('AI', "로컬 모델 로드에 실패했습니다. (WebGPU 미지원 또는 네트워크 오류)");
-            statusText.innerText = "Status: On-Device Load Failed";
-            isModelLoading = false;
-            return null;
-        }
+        if (!aiWorker) initWorker();
+        aiWorker.postMessage({ type: 'load' });
+
+        return new Promise((resolve) => {
+            const onReady = () => {
+                loader.remove();
+                addChatMessage('AI', "경량화된 로컬 모델이 준비되었습니다! 이제 UI 끊김 없이 대화할 수 있습니다.");
+                document.removeEventListener('ai-model-ready', onReady);
+                isModelLoading = false;
+                resolve(true);
+            };
+            document.addEventListener('ai-model-ready', onReady);
+        });
     }
 
-    // API 연동 로직 (Online Mode)
     async function getLlama3BResponse(userQuery) {
-        // [IMPORTANT] 여기에 실제 Groq API 키를 넣으시면 온라인 모드가 활성화됩니다.
         const GROQ_API_KEY = 'YOUR_GROQ_API_KEY';
 
-        // 키가 기본값이면 'On-Device(Keyless)' 모드로 실행
         if (GROQ_API_KEY === 'YOUR_GROQ_API_KEY' || GROQ_API_KEY === '') {
-            console.log('[AI] Running in On-Device (Keyless) Mode');
-            const localGen = await loadOnDeviceModel();
-            if (localGen) {
-                // Qwen Chat 포맷에 맞게 프롬프트 구성
-                const prompt = `<|im_start|>user\n${userQuery}<|im_end|>\n<|im_start|>assistant\n`;
-                const output = await localGen(prompt, {
-                    max_new_tokens: 256,
-                    temperature: 0.7,
-                    repetition_penalty: 1.1,
-                    do_sample: true
-                });
+            console.log('[AI] Handling via Web Worker (On-Device)');
 
-                // 결과에서 프롬프트 제외하고 답변만 추출
-                const fullText = output[0].generated_text;
-                const response = fullText.split('assistant\n').pop().trim();
-                return response || fullText;
+            if (!modelReady) {
+                await loadOnDeviceModel();
             }
-            return "On-Device 모델 로딩 중입니다. 잠시만 기다려 주세요...";
+
+            return new Promise((resolve) => {
+                const handleMessage = (e) => {
+                    if (e.data.type === 'result') {
+                        aiWorker.removeEventListener('message', handleMessage);
+                        resolve(e.data.data);
+                    } else if (e.data.type === 'error') {
+                        aiWorker.removeEventListener('message', handleMessage);
+                        resolve("AI 생성 중 오류가 발생했습니다: " + e.data.data);
+                    }
+                };
+                aiWorker.addEventListener('message', handleMessage);
+                aiWorker.postMessage({ type: 'generate', text: userQuery });
+            });
         }
 
-        // ... 기존 Groq API 호출 로직 ...
+        // Online Mode (Groq)
         const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${GROQ_API_KEY}`, 'Content-Type': 'application/json' },
