@@ -1,7 +1,7 @@
 import "@supabase/functions-js/edge-runtime.d.ts"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-// 💡 [추가] Deno 표준 라이브러리에서 Base64 인코더를 가져옵니다.
 import { encode } from "https://deno.land/std@0.168.0/encoding/base64.ts"
+import { HfInference } from "https://esm.sh/@huggingface/inference"
 
 // 1. 모든 응답(성공/실패/Preflight)에 필요한 CORS 헤더
 const corsHeaders = {
@@ -39,38 +39,51 @@ serve(async (req) => {
       return new Response(data, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
 
-    // 4. 미디어 생성 (Hugging Face - Router API 적용)
+    // 4. 미디어 생성 (Hugging Face 공식 SDK)
     if (type === 'image' || type === 'music') {
-      const modelId = type === 'image'
-        ? 'black-forest-labs/FLUX.1-schnell'
-        : 'facebook/musicgen-small';
+      const hf = new HfInference(hfToken);
+      let buffer: ArrayBuffer;
+      let mimeType = '';
 
-      const response = await fetch(`https://router.huggingface.co/hf-inference/models/${modelId}`, {
-        headers: {
-          Authorization: `Bearer ${hfToken}`,
-          "Content-Type": "application/json",
-          "x-wait-for-model": "true"
-        },
-        method: "POST",
-        body: JSON.stringify({ inputs: prompt }),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`[HF Router Error] Status: ${response.status}, Body: ${errorText}`);
-        return new Response(JSON.stringify({ error: `Router API Fail`, details: errorText }), {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" }
+      if (type === 'image') {
+        const blob = await hf.textToImage({
+          model: 'black-forest-labs/FLUX.1-schnell',
+          inputs: prompt,
         });
+        buffer = await blob.arrayBuffer();
+        mimeType = blob.type || 'image/jpeg';
+      } else {
+        // 오디오 생성 (Suno Bark 모델로 변경 및 예외 처리 추가)
+        try {
+          // Bark 모델은 프롬프트 앞에 [music] 태그를 달아주면 음악성 사운드를 생성합니다.
+          const audioPrompt = `[music] ${prompt}`; 
+          let blob;
+          
+          if (typeof hf.textToAudio === 'function') {
+            blob = await hf.textToAudio({
+              model: 'suno/bark-small', // 💡 현재 가장 안정적인 무료 오디오 모델
+              inputs: audioPrompt,
+            });
+          } else {
+            blob = await hf.textToSpeech({
+              model: 'suno/bark-small',
+              inputs: audioPrompt,
+            });
+          }
+          buffer = await blob.arrayBuffer();
+          mimeType = blob.type || 'audio/wav';
+          
+        } catch (audioErr) {
+          // 💡 허깅페이스 서버가 닫혀있을 때를 대비한 방어 코드
+          console.error("[HF Audio Error]", audioErr);
+          throw new Error("현재 Hugging Face 무료 오디오 생성 서버의 자원이 모두 사용 중입니다. 잠시 후 다시 시도해주세요.");
+        }
       }
 
-      const buffer = await response.arrayBuffer();
-      // 데이터가 너무 작으면 에러로 간주
-      if (buffer.byteLength < 1000) throw new Error("수신된 데이터가 너무 작습니다.");
+      if (buffer.byteLength < 1000) throw new Error("생성된 데이터가 너무 작습니다. (생성 실패)");
 
-      // 💡 [핵심 변경] 바이너리를 서버에서 바로 Data URL(Base64)로 굽습니다!
+      // 바이너리를 서버에서 바로 Data URL(Base64)로 인코딩
       const base64String = encode(buffer);
-      const mimeType = type === 'image' ? 'image/jpeg' : 'audio/mpeg';
       const dataUrl = `data:${mimeType};base64,${base64String}`;
 
       // JSON 형태로 안전하게 프론트엔드로 전달
@@ -83,6 +96,7 @@ serve(async (req) => {
     }
 
   } catch (error) {
+    console.error("[System Error]", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

@@ -365,8 +365,9 @@ export function initAIAssistant(supabase) {
                 }
             } catch (err) {
                 if (loader) loader.remove();
-                addChatMessage('AI', "[System: Error] 연결 오류가 발생했습니다.");
-                console.error(err);
+                // 서버가 넘겨준 에러 메시지(err.message)를 텍스트로 출력합니다.
+                addChatMessage('AI', `[System: Error] ${err.message}`);
+                console.error("생성 에러:", err);
             }
         }
     });
