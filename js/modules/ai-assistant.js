@@ -265,27 +265,22 @@ export function initAIAssistant(supabase) {
     // ai-assistant.js 내 generateMedia 함수 수정
     async function generateMedia(type, prompt) {
         try {
-            // 💡 핵심: responseType을 'blob'으로 지정하여 바이너리 데이터를 명확히 요청합니다.
+            // responseType: 'blob' 옵션 제거 (JSON으로 받을 것이기 때문)
             const { data, error } = await supabase.functions.invoke('ai-proxy', {
-                body: { type, prompt },
-                responseType: 'blob'
+                body: { type, prompt }
             });
 
-            // 💡 400 에러 등이 발생했을 때 처리
+            // 에러 처리 로직
             if (error) {
                 let errorMsg = error.message;
                 try {
-                    // error.context가 Response 객체인 경우
                     if (error.context && typeof error.context.text === 'function') {
                         const errorText = await error.context.text();
                         console.error("[System] 에러 원문:", errorText);
                         const errorBody = JSON.parse(errorText);
-
-                        // 자세한 에러 메시지를 얻기 위함
                         const detailsInfo = typeof errorBody.details === 'string' && errorBody.details.startsWith('{')
                             ? JSON.parse(errorBody.details).error
                             : errorBody.details;
-
                         errorMsg = detailsInfo || errorBody.error || errorMsg;
                     }
                 } catch (e) {
@@ -293,52 +288,14 @@ export function initAIAssistant(supabase) {
                 }
 
                 if (errorMsg.includes('Token is expired') || errorMsg.includes('Invalid token')) {
-                    errorMsg = 'Hugging Face 토큰이 만료되었거나 올바르지 않습니다. (Supabase 환경변수 HF_TOKEN을 확인해주세요)';
+                    errorMsg = 'Hugging Face 토큰이 만료되었거나 올바르지 않습니다.';
                 }
                 throw new Error(errorMsg);
             }
 
-            // 2. 강제로 Blob 생성
-            const finalBlob = new Blob([data], { type: type === 'image' ? 'image/jpeg' : 'audio/mpeg' });
-            console.log(`[System] 가벼운 모델로부터 ${finalBlob.size} 바이트 수신 성공.`);
-
-            // 3. 404가 절대 날 수 없는 Base64(Data URL)로 변환
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(finalBlob);
-            });
-
-            // 2. 💡 [핵심] 수신된 데이터를 강제로 Blob으로 만듭니다. 
-            // ArrayBuffer로 왔든, 이미 Blob이든 상관없이 이 코드가 처리합니다.
-            // const finalBlob = new Blob([data], { type: type === 'image' ? 'image/png' : 'audio/mpeg' });
-
-            // console.log(`[System] 데이터 확보 완료 (크기: ${finalBlob.size} 바이트)`);
-
-            // // 3. FileReader를 통해 404 에러가 절대 날 수 없는 Data URL로 변환합니다.
-            // return new Promise((resolve, reject) => {
-            //     const reader = new FileReader();
-
-            //     reader.onloadend = () => {
-            //         const base64Data = reader.result;
-            //         // 변환된 데이터가 너무 짧으면 이미지 생성 실패로 간주
-            //         if (base64Data.length < 500) {
-            //             reject(new Error("데이터가 너무 작아 정상적인 이미지로 변환할 수 없습니다."));
-            //         } else {
-            //             console.log(`[System] Base64 변환 성공. 주소 생성 완료.`);
-            //             resolve(base64Data);
-            //         }
-            //     };
-
-            //     reader.onerror = () => {
-            //         console.error("[System] FileReader 에러 발생");
-            //         reject(new Error("바이너리 데이터를 읽는 중 오류가 발생했습니다."));
-            //     };
-
-            //     // 이제 finalBlob은 확실히 Blob 타입이므로 에러가 나지 않습니다.
-            //     reader.readAsDataURL(finalBlob);
-            // });
+            // 💡 [핵심] FileReader와 Blob 로직을 전부 지우고, 바로 URL 반환!
+            console.log(`[System] ${type} 데이터 수신 완료.`);
+            return data.url;
 
         } catch (err) {
             console.error(`[System] ${type} 생성 실패:`, err.message);

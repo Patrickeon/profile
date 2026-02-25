@@ -1,5 +1,7 @@
 import "@supabase/functions-js/edge-runtime.d.ts"
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+// 💡 [추가] Deno 표준 라이브러리에서 Base64 인코더를 가져옵니다.
+import { encode } from "https://deno.land/std@0.168.0/encoding/base64.ts"
 
 // 1. 모든 응답(성공/실패/Preflight)에 필요한 CORS 헤더
 const corsHeaders = {
@@ -40,11 +42,9 @@ serve(async (req) => {
     // 4. 미디어 생성 (Hugging Face - Router API 적용)
     if (type === 'image' || type === 'music') {
       const modelId = type === 'image'
-        ? 'black-forest-labs/FLUX.1-schnell' // stable-diffusion-v1-5는 지원 종료됨
+        ? 'black-forest-labs/FLUX.1-schnell'
         : 'facebook/musicgen-small';
 
-      // 💡 [핵심 변경] 구형 주소 대신 신형 Router 주소를 사용합니다.
-      // https://router.huggingface.co/hf-inference/models/ 가 최신 규격입니다.
       const response = await fetch(`https://router.huggingface.co/hf-inference/models/${modelId}`, {
         headers: {
           Authorization: `Bearer ${hfToken}`,
@@ -65,32 +65,24 @@ serve(async (req) => {
       }
 
       const buffer = await response.arrayBuffer();
-      // 💡 데이터가 너무 작으면 에러로 간주
+      // 데이터가 너무 작으면 에러로 간주
       if (buffer.byteLength < 1000) throw new Error("수신된 데이터가 너무 작습니다.");
 
-      return new Response(new Uint8Array(buffer), {
+      // 💡 [핵심 변경] 바이너리를 서버에서 바로 Data URL(Base64)로 굽습니다!
+      const base64String = encode(buffer);
+      const mimeType = type === 'image' ? 'image/jpeg' : 'audio/mpeg';
+      const dataUrl = `data:${mimeType};base64,${base64String}`;
+
+      // JSON 형태로 안전하게 프론트엔드로 전달
+      return new Response(JSON.stringify({ url: dataUrl }), {
         headers: {
           ...corsHeaders,
-          "Content-Type": type === 'image' ? "image/jpeg" : "audio/mpeg",
-          "Content-Length": buffer.byteLength.toString()
+          "Content-Type": "application/json"
         }
       });
-
-      // 💡 [변경] ArrayBuffer를 Uint8Array로 감싸서 응답의 무결성을 보장합니다.
-      // const arrayBuffer = await response.arrayBuffer();
-      // const uint8Array = new Uint8Array(arrayBuffer);
-
-      // return new Response(uint8Array, {
-      //   headers: { 
-      //     ...corsHeaders, 
-      //     "Content-Type": type === 'image' ? "image/png" : "audio/mpeg", // 💡 png로 명시 권장
-      //     "Content-Length": uint8Array.length.toString()
-      //   }
-      // });
     }
 
   } catch (error) {
-    // 💡 에러 발생 시에도 반드시 CORS 헤더를 포함해야 브라우저가 에러를 읽을 수 있습니다.
     return new Response(JSON.stringify({ error: error.message }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

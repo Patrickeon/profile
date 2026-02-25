@@ -44,8 +44,8 @@
     bottom: 80px;
     left: 0;
     /* 위젯 위치에 맞춰 왼쪽 정렬 */
-    width: 320px;
-    height: 400px;
+    width: 500px;
+    height: 500px;
     display: flex;
     flex-direction: column;
     transform: translateY(20px);
