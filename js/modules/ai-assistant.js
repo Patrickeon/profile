@@ -3,6 +3,7 @@
  * 1. Online Mode: Groq/Hugging Face API 연동
  * 2. Offline Mode (On-Device): Transformers.js 기반 브라우저 내 구동 (API 키 불필요)
  */
+import { HfInference } from 'https://esm.sh/@huggingface/inference';
 
 export function initAIAssistant(supabase) {
     // 💡 가장 먼저 로그를 찍어보세요.
@@ -272,12 +273,28 @@ export function initAIAssistant(supabase) {
 
             // 💡 400 에러 등이 발생했을 때 처리
             if (error) {
-                // 서버가 보낸 에러 메시지(JSON)를 파싱 시도
                 let errorMsg = error.message;
                 try {
-                    const errorBody = JSON.parse(await error.context.text());
-                    errorMsg = errorBody.details || errorBody.error || errorMsg;
-                } catch (e) { /* JSON 파싱 실패 시 기본 메시지 사용 */ }
+                    // error.context가 Response 객체인 경우
+                    if (error.context && typeof error.context.text === 'function') {
+                        const errorText = await error.context.text();
+                        console.error("[System] 에러 원문:", errorText);
+                        const errorBody = JSON.parse(errorText);
+
+                        // 자세한 에러 메시지를 얻기 위함
+                        const detailsInfo = typeof errorBody.details === 'string' && errorBody.details.startsWith('{')
+                            ? JSON.parse(errorBody.details).error
+                            : errorBody.details;
+
+                        errorMsg = detailsInfo || errorBody.error || errorMsg;
+                    }
+                } catch (e) {
+                    console.error("[System] 에러 파싱 실패:", e);
+                }
+
+                if (errorMsg.includes('Token is expired') || errorMsg.includes('Invalid token')) {
+                    errorMsg = 'Hugging Face 토큰이 만료되었거나 올바르지 않습니다. (Supabase 환경변수 HF_TOKEN을 확인해주세요)';
+                }
                 throw new Error(errorMsg);
             }
 
@@ -324,7 +341,6 @@ export function initAIAssistant(supabase) {
             // });
 
         } catch (err) {
-            // 8년 차 개발자답게 에러의 정체를 명확히 출력
             console.error(`[System] ${type} 생성 실패:`, err.message);
             throw err;
         }

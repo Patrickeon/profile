@@ -546,6 +546,7 @@ a:hover {
     overflow: hidden;
     position: relative;
     /* Important for horizontal scroll pinning */
+    background: rgba(0, 0, 0, 0.2);
 }
 
 .timeline-container {

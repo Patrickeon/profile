@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 프로젝트 보드 (Archive) - DB 데이터 및 WEB 보강 버전
         await initProjectBoard(supabaseClient);
 
-        console.log('====================== ', supabase);
+        console.log('====================== ', supabaseClient);
 
         // AI 비서 위젯 (Chatbot)
         initAIAssistant(supabaseClient);

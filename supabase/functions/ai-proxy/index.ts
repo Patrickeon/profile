@@ -23,9 +23,9 @@ serve(async (req) => {
     if (type === 'text') {
       const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Authorization': `Bearer ${groqKey}`,
-          'Content-Type': 'application/json' 
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           model: "llama-3.1-8b-instant",
@@ -39,17 +39,17 @@ serve(async (req) => {
 
     // 4. 미디어 생성 (Hugging Face - Router API 적용)
     if (type === 'image' || type === 'music') {
-      const modelId = type === 'image' 
-        ? 'runwayml/stable-diffusion-v1-5' 
+      const modelId = type === 'image'
+        ? 'black-forest-labs/FLUX.1-schnell' // stable-diffusion-v1-5는 지원 종료됨
         : 'facebook/musicgen-small';
 
       // 💡 [핵심 변경] 구형 주소 대신 신형 Router 주소를 사용합니다.
       // https://router.huggingface.co/hf-inference/models/ 가 최신 규격입니다.
       const response = await fetch(`https://router.huggingface.co/hf-inference/models/${modelId}`, {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${hfToken}`,
           "Content-Type": "application/json",
-          "x-wait-for-model": "true" 
+          "x-wait-for-model": "true"
         },
         method: "POST",
         body: JSON.stringify({ inputs: prompt }),
@@ -69,8 +69,8 @@ serve(async (req) => {
       if (buffer.byteLength < 1000) throw new Error("수신된 데이터가 너무 작습니다.");
 
       return new Response(new Uint8Array(buffer), {
-        headers: { 
-          ...corsHeaders, 
+        headers: {
+          ...corsHeaders,
           "Content-Type": type === 'image' ? "image/jpeg" : "audio/mpeg",
           "Content-Length": buffer.byteLength.toString()
         }

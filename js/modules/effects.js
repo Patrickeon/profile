@@ -189,7 +189,7 @@ function initHorizontalScroll() {
                 end: () => `+=${timelineTrack.scrollWidth * 0.5}`, // 더 빨리 끝나게 조정
                 pin: true,
                 animation: horizontalTween,
-                scrub: 1,
+                scrub: 0.2, // 반응성 개선을 위해 1에서 0.2로 낮춤 (부드럽게 즉각 반응)
                 invalidateOnRefresh: true
             });
 
