@@ -26,6 +26,7 @@
     <link rel="stylesheet" href="css/components/toc.css">
     <link rel="stylesheet" href="css/components/board.css">
     <link rel="stylesheet" href="css/components/ai-assistant.css">
+    <link rel="stylesheet" href="css/components/modal.css">
 </head>
 
 <body>
@@ -65,10 +66,9 @@
         <section id="hero" class="section hero-section">
             <div class="glass-panel hero-content">
                 <p class="glitch-text code-font">> System Initialized...</p>
-                <h1 class="title">Hello, World.<br>I build <span class="text-gradient">intelligent</span> conversations.
-                </h1>
-                <p class="subtitle">2016년부터 AI와 인간을 잇는 시스템을 설계해 온 8년 차 개발자 <strong>Patrick</strong>입니다.</p>
-                <button class="btn-primary"
+                <h1 class="title"><span data-i18n="hero.title.prefix">Hello, World.<br>I build </span><span class="text-gradient" data-i18n="hero.title.highlight">intelligent</span><span data-i18n="hero.title.suffix"> conversations.</span></h1>
+                <p class="subtitle" data-i18n="hero.subtitle">2016년부터 AI와 인간을 잇는 시스템을 설계해 온 8년 차 개발자 <strong>Patrick</strong>입니다.</p>
+                <button class="btn-primary" data-i18n="hero.btn"
                     onclick="document.getElementById('about').scrollIntoView({behavior: 'smooth'})">
                     Initialize Connection
                 </button>
@@ -89,29 +89,22 @@
                 <div class="console-body">
                     <p class="code-font">> Analyzing capabilities...</p>
 
-                    <div class="profile-info"
-                        style="display: flex; gap: 2rem; align-items: center; margin-bottom: 2rem; flex-wrap: wrap;">
-                        <div class="profile-image"
-                            style="width: 150px; height: 170px; border-radius: 50%; overflow: hidden; border: 2px solid var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue-glow); flex-shrink: 0; background: #0a0a0a; display: flex; align-items: center; justify-content: center; position: relative;">
+                    <div class="profile-info-container">
+                        <div class="profile-image-container">
                             <!-- TODO: assets/images/profile.jpg에 실제 사진을 넣어주세요 -->
-                            <img src="assets/images/profile.jpg" alt="Patrick Profile"
-                                style="width: 100%; height: 100%; object-fit: cover; object-position: center 20%; position: relative; z-index: 2;"
+                            <img src="assets/images/profile.jpg" alt="Patrick Profile" class="profile-img"
                                 onerror="this.style.display='none'">
-                            <span
-                                style="position: absolute; font-family: var(--font-heading); color: var(--neon-blue); font-weight: 800; font-size: 1.5rem;">PATRICK</span>
+                            <span class="profile-name-overlay">PATRICK</span>
                         </div>
                         <div class="profile-details">
-                            <h3
-                                style="color: var(--neon-purple); margin-bottom: 0.5rem; font-family: var(--font-code);">
-                                > Personal Profile</h3>
-                            <ul style="list-style: none; padding: 0; color: var(--text-secondary); line-height: 1.8;">
-                                <li><strong style="color: var(--text-primary);">Name:</strong> 김건훈</li>
-                                <li><strong style="color: var(--text-primary);">BirthDate:</strong> 1994.01.20
-                                </li>
-                                <li><strong style="color: var(--text-primary);">Exp:</strong> 8년 차 (2016 ~ 2026)</li>
+                            <h3 class="profile-subtitle">> Personal Profile</h3>
+                            <ul class="profile-list">
+                                <li><strong class="profile-label">Name:</strong> <span data-i18n="profile.name">김건훈</span></li>
+                                <li><strong class="profile-label">BirthDate:</strong> 1994.01.20</li>
+                                <li><strong class="profile-label">Exp:</strong> <span data-i18n="profile.exp">8년 차 (2016 ~ 2026)</span></li>
                             </ul>
-                            <p class="about-text" style="font-size: 0.95rem; margin-top: 1rem; color: #ccc;">복잡한 AI 로직을
-                                유저 친화적인 UX로 풀어내는 브릿지(Bridge) 역할을 수행합니다.</p>
+                            <p class="about-text about-text-styled" data-i18n="about.role">복잡한 AI 로직을 유저 친화적인 UX로 풀어내는 브릿지(Bridge) 역할을 수행합니다.</p>
+                            <a href="assets/Patrick_Resume.pdf" class="btn-primary" style="margin-top: 1.5rem; display: inline-block; padding: 0.8rem 2rem; font-size: 0.9rem;" download>Download Patrick_Resume (PDF)</a>
                         </div>
                     </div>
 
@@ -251,10 +244,10 @@
             <div class="glass-panel board-container">
                 <div class="board-header">
                     <div class="filter-tabs">
-                        <button class="filter-btn active" data-filter="all">ALL</button>
-                        <button class="filter-btn" data-filter="ai">AI / LLM</button>
-                        <button class="filter-btn" data-filter="web">WEB / APP</button>
-                        <button class="filter-btn" data-filter="system">SYSTEM</button>
+                        <button class="filter-btn active" data-filter="all" data-i18n="board.filter.all">ALL</button>
+                        <button class="filter-btn" data-filter="ai" data-i18n="board.filter.ai">AI / LLM</button>
+                        <button class="filter-btn" data-filter="web" data-i18n="board.filter.web">WEB / APP</button>
+                        <button class="filter-btn" data-filter="system" data-i18n="board.filter.system">SYSTEM</button>
                     </div>
                     <div class="board-search">
                         <input type="text" id="board-search-input" placeholder="Search archive...">
@@ -273,7 +266,7 @@
                 <div class="chat-history" id="chat-history">
                     <div class="chat-message ai-message">
                         <span class="avatar">AI</span>
-                        <div class="message-bubble">연결이 수립되었습니다. 어떤 메시지를 남기시겠습니까?</div>
+                        <div class="message-bubble" data-i18n="contact.ai_msg">연결이 수립되었습니다. 어떤 메시지를 남기시겠습니까?</div>
                     </div>
                 </div>
                 <div class="chat-input-area">
@@ -293,17 +286,28 @@
                         <h4>PATRICK AI Assistant</h4>
                         <span class="status-indicator">Multimodal Mode (Text/Image/Music)</span>
                     </div>
-                    <button class="close-chat" id="close-chat"
-                        style="background:none; border:none; color:#666; cursor:pointer; font-size:1.2rem;">&times;</button>
+                    <button class="close-chat" id="close-chat" title="닫기">&times;</button>
                 </div>
                 <div class="ai-chat-body" id="ai-chat-body">
                     <div class="chat-message ai-message">
-                        <div class="message-bubble" style="font-size: 0.85rem;">안녕하세요! Patrick님의 8년 차 개발 여정에 대해 궁금한 점이
-                            있으신가요?</div>
+                        <div class="message-bubble message-bubble-sm" data-i18n="ai.greeting">안녕하세요! Patrick님의 8년 차 개발 여정에 대해 궁금한 점이 있으신가요?</div>
                     </div>
                 </div>
                 <div class="ai-chat-input-container">
-                    <input type="text" class="ai-chat-input" id="ai-chat-input" placeholder="질문을 입력하세요...">
+                    <input type="text" class="ai-chat-input" id="ai-chat-input" data-i18n="ai.placeholder" placeholder="질문을 입력하세요...">
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Detail Modal -->
+        <div id="project-modal" class="modal-overlay">
+            <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+                <button class="modal-close" id="modal-close" title="Close Modal">&times;</button>
+                <div class="modal-year" id="modal-year">2024</div>
+                <h2 class="modal-title" id="modal-title">Project Title</h2>
+                <div class="modal-desc" id="modal-desc">Project Description</div>
+                <div class="modal-tech-stack" id="modal-tech">
+                    <!-- Badges injected dynamically -->
                 </div>
             </div>
         </div>

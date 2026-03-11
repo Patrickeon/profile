@@ -226,17 +226,26 @@ export function initAIAssistant(supabase) {
             });
 
             if (error) {
-                console.error('에러 발생:', error);
-                return "죄송합니다. 서버 연결에 실패했습니다.";
+                let errorMsg = error.message;
+                try {
+                    if (error.context && typeof error.context.text === 'function') {
+                        const errorText = await error.context.text();
+                        console.error("[System] 에러 원문:", errorText);
+                        const errorBody = JSON.parse(errorText);
+                        errorMsg = errorBody.error || errorMsg;
+                    }
+                } catch (e) {
+                    console.error("[System] 에러 파싱 실패:", e);
+                }
+                console.error('엣지 함수 에러 발생:', errorMsg);
+                return `[단말기 오류] ${errorMsg}`;
             }
 
             // Groq API 응답 구조에 맞춰 결과 반환
             return data.choices[0].message.content;
         } catch (err) {
-            return new Response(JSON.stringify({ error: error.message }), {
-                status: 400,
-                headers: { "Content-Type": "application/json" },
-            });
+            console.error("AI 응답 처리 중 에러 (네트워크 혹은 서버 연결 실패):", err);
+            return "죄송합니다. 현재 AI 서버(Supabase)에 연결할 수 없습니다. 호스팅 상태(프로젝트 일시 중지 등)를 확인해 주세요.";
         }
 
     }

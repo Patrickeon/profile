@@ -1,0 +1,194 @@
+/* --- Premium Glassmorphic Project Detail Modal Styles --- */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Darker, more immersive backdrop */
+    background: rgba(5, 5, 5, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.modal-content {
+    /* Sleek gradient background */
+    background: linear-gradient(145deg, rgba(20, 20, 25, 0.95), rgba(10, 10, 15, 0.95));
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    border-radius: 24px; /* More rounded premium feel */
+    width: 90%;
+    max-width: 650px;
+    max-height: 85vh;
+    padding: 3rem;
+    
+    /* Layered glowing shadows for depth */
+    box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.7), 
+        0 0 40px rgba(0, 243, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        
+    /* Smooth entrance animation */
+    transform: translateY(40px) scale(0.92);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow-y: auto;
+    
+    /* Custom Scrollbar for the modal */
+    scrollbar-width: thin;
+    scrollbar-color: var(--neon-blue) rgba(255,255,255,0.05);
+}
+
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+.modal-content::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, var(--neon-blue), var(--neon-purple));
+    border-radius: 10px;
+}
+
+.modal-overlay.active .modal-content {
+    transform: translateY(0) scale(1);
+}
+
+.modal-close {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    color: #fff;
+    background: rgba(0, 243, 255, 0.15);
+    border-color: var(--neon-blue);
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 0 15px var(--neon-blue-glow);
+}
+
+.modal-year {
+    display: inline-block;
+    color: #fff;
+    background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue));
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-family: var(--font-code);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(157, 0, 255, 0.3);
+}
+
+.modal-title {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: #ffffff;
+    font-weight: 800;
+    line-height: 1.2;
+    background: linear-gradient(to right, #ffffff, #a0a0a0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.modal-desc {
+    font-size: 1.1rem;
+    color: rgba(255,255,255,0.8);
+    line-height: 1.8;
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+/* Tech Stack Container */
+.modal-tech-stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.modal-tech-stack::before {
+    content: '> Stack Utilized:';
+    width: 100%;
+    font-family: var(--font-code);
+    color: var(--neon-blue);
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.modal-tech-badge {
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    border: 1px solid rgba(0, 243, 255, 0.3);
+    padding: 6px 16px;
+    border-radius: 8px; /* Slightly squarer for tech aesthetic */
+    font-size: 0.85rem;
+    font-family: var(--font-code);
+    transition: all 0.3s ease;
+    box-shadow: inset 0 0 10px rgba(0, 243, 255, 0.05);
+}
+
+.modal-tech-badge:hover {
+    border-color: var(--neon-blue);
+    background: rgba(0, 243, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 243, 255, 0.2), inset 0 0 10px rgba(0, 243, 255, 0.1);
+}
+
+/* Light Theme Overrides */
+[data-theme="light"] .modal-content {
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.95), rgba(240, 245, 250, 0.98));
+    border: 1px solid rgba(0, 102, 204, 0.2);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .modal-title {
+    background: linear-gradient(to right, #1a202c, #4a5568);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .modal-desc {
+    color: #4a5568;
+    border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .modal-tech-badge {
+    background: #f8fafc;
+    color: #1a202c;
+    border: 1px solid rgba(0, 102, 204, 0.3);
+}
+
+[data-theme="light"] .modal-tech-badge:hover {
+    background: rgba(0, 102, 204, 0.05);
+}

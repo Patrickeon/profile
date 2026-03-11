@@ -7,6 +7,9 @@ import { initProjectBoard } from './modules/board.js';
 import { initAIAssistant } from './modules/ai-assistant.js';
 import { initEffects } from './modules/effects.js';
 import { initContact } from './modules/contact.js';
+import { initThemeToggle } from './modules/theme.js';
+import { initI18n } from './modules/i18n.js';
+import { initModal } from './modules/modal.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // 1. Supabase 초기화 구성
@@ -39,6 +42,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 터미널 Contact 섹션
         initContact();
+
+        // 테마 매니저 토글 활성화
+        initThemeToggle();
+        
+        // 다국어(i18n) 지원 초기화
+        initI18n();
+
+        // 모달창 (Project Detail) 초기화 및 닫기 이벤트 등록
+        initModal();
 
         console.log('[System] Mission Control: All modules synchronized.');
     } catch (error) {

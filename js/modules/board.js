@@ -3,6 +3,8 @@
  * Supabase 데이터 페칭, 필터링, 검색 및 렌더링을 담당합니다.
  */
 
+import { openModal } from './modal.js';
+
 export async function initProjectBoard(supabase) {
     const projectGrid = document.getElementById('project-grid');
     const filterBtns = document.querySelectorAll('.filter-btn');
@@ -64,29 +66,17 @@ async function renderProjects(container, supabase, filter = 'all', search = '') 
         }
     });
 
-    let projects = [];
+    // 사용자의 요청으로 DB 연동 대신 항상 기본 예시 데이터(fallbackData)만 사용하도록 변경했습니다.
+    let projects = fallbackData.filter(p => {
+        if (filter === 'all') return true;
+        if (filter === 'web') {
+            // WEB 카테고리 선택 시, 명시적 web 외에도 ai 프로젝트 중 상당수를 포함
+            return p.category === 'web' || p.category === 'ai';
+        }
+        return p.category === filter;
+    });
 
     try {
-        if (supabase) {
-            let query = supabase.from('projects').select('*');
-            if (filter !== 'all') {
-                query = query.eq('category', filter);
-            }
-            const { data, error } = await query;
-            if (error) throw error;
-            projects = data;
-        } else {
-            // 필터링 적용 (WEB 카테고리일 경우 AI 프로젝트 중 WEB 기반인 것들도 포함)
-            projects = fallbackData.filter(p => {
-                if (filter === 'all') return true;
-                if (filter === 'web') {
-                    // WEB 카테고리 선택 시, 명시적 web 외에도 ai 프로젝트 중 상당수를 포함
-                    return p.category === 'web' || p.category === 'ai';
-                }
-                return p.category === filter;
-            });
-        }
-
         // 검색어 필터링
         if (search) {
             projects = projects.filter(p =>
@@ -98,7 +88,7 @@ async function renderProjects(container, supabase, filter = 'all', search = '') 
         container.innerHTML = '';
 
         if (projects.length === 0) {
-            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">연결된 기록이 없습니다.</p>';
+            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);" data-i18n="board.empty">관련 프로젝트가 없습니다.</p>';
             return;
         }
 
@@ -120,9 +110,20 @@ async function renderProjects(container, supabase, filter = 'all', search = '') 
 
         // DETAIL 버튼 클릭 이벤트 바인딩 (이벤트 위임 사용)
         container.addEventListener('click', (e) => {
-            if (e.target.classList.contains('read-more')) {
-                const title = e.target.getAttribute('data-title');
-                if (window.showProjectDetail) window.showProjectDetail(title);
+            const btn = e.target.closest('.read-more');
+            if (btn) {
+                const title = btn.getAttribute('data-title');
+                const project = projects.find(p => p.title === title) || projects[0];
+                
+                // 기술 스택 추출 (DESC 안의 쉼표나 영단어 덩어리들을 단순 파싱)
+                let techStack = [];
+                const techMatch = (project.desc || project.description || '').match(/[A-Za-z.\s,]+/);
+                if (techMatch) {
+                    techStack = techMatch[0].split(',').map(t => t.trim()).filter(Boolean);
+                }
+
+                // Modal 띄우기 (연결 완료!)
+                openModal(project.year, project.title, project.desc || project.description, techStack);
             }
         });
 
@@ -138,14 +139,6 @@ async function renderProjects(container, supabase, filter = 'all', search = '') 
 
     } catch (err) {
         console.error('Board Rendering Error:', err);
-        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff5f56;">[ERROR] 데이터베이스 연결에 실패했습니다.</p>';
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff5f56;">[ERROR] 데이터 렌더링에 실패했습니다.</p>';
     }
 }
-
-/**
- * 프로젝트 상세 보기 (글로벌 함수로 정의하여 onclick에서 호출 가능하게 함)
- */
-window.showProjectDetail = function (title) {
-    // 실제 운영 시에는 모달창을 띄우는 것이 좋지만, 우선은 alert으로 반응 확인
-    alert(`[Project Detail]\n\n선택하신 '${title}' 프로젝트의 상세 정보 패킷을 요청 중입니다.\n현재는 프로토타입 단계로, 정식 버전에서 상세 내용을 확인하실 수 있습니다.`);
-};

@@ -220,3 +220,8 @@
     box-shadow: 0 0 10px var(--neon-blue-glow);
     transform: translateY(-2px);
 }
+
+/* Small Message Bubble */
+.message-bubble-sm {
+    font-size: 0.85rem;
+}

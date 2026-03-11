@@ -1,105 +1,104 @@
-import "@supabase/functions-js/edge-runtime.d.ts"
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { encode } from "https://deno.land/std@0.168.0/encoding/base64.ts"
-import { HfInference } from "https://esm.sh/@huggingface/inference"
+import "@supabase/functions-js/edge-runtime.d.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { encode } from "https://deno.land/std@0.168.0/encoding/base64.ts";
+import { HfInference } from "https://esm.sh/@huggingface/inference";
 
-// 1. 모든 응답(성공/실패/Preflight)에 필요한 CORS 헤더
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+const corsHeaders: Record<string, string> = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+function json(data: unknown, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
 }
 
 serve(async (req) => {
-  // 2. Preflight (OPTIONS) 요청 즉시 처리
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  if (req.method !== "POST") return json({ error: "Method Not Allowed" }, 405);
 
   try {
-    const { type, prompt } = await req.json();
-    const hfToken = Deno.env.get('HF_TOKEN');
-    const groqKey = Deno.env.get('GROQ_API_KEY');
+    const body = await req.json().catch(() => null);
+    const type = body?.type;
+    const prompt = body?.prompt;
 
-    // 3. 텍스트 대화 (Groq)
-    if (type === 'text') {
-      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-        method: 'POST',
+    if (!type) return json({ error: "type 이 누락되었습니다." }, 400);
+
+    // 1) TEXT (Groq)
+    if (type === "text") {
+      const groqKey = Deno.env.get("GROQ_API_KEY");
+      if (!groqKey) return json({ error: "GROQ_API_KEY가 설정되어 있지 않습니다." }, 500);
+      if (!Array.isArray(prompt)) return json({ error: "text 타입은 prompt가 messages 배열이어야 합니다." }, 400);
+
+      const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${groqKey}`,
-          'Content-Type': 'application/json'
+          Authorization: `Bearer ${groqKey}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           model: "llama-3.1-8b-instant",
           messages: prompt,
-          temperature: 0.7
-        })
+          temperature: 0.7,
+        }),
       });
-      const data = await response.text();
-      return new Response(data, { headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
-    }
 
-    // 4. 미디어 생성 (Hugging Face 공식 SDK)
-    if (type === 'image' || type === 'music') {
-      const hf = new HfInference(hfToken);
-      let buffer: ArrayBuffer;
-      let mimeType = '';
-
-      if (type === 'image') {
-        const blob = await hf.textToImage({
-          model: 'black-forest-labs/FLUX.1-schnell',
-          inputs: prompt,
-        });
-        buffer = await blob.arrayBuffer();
-        mimeType = blob.type || 'image/jpeg';
-      } else {
-        // 오디오 생성 (Suno Bark 모델로 변경 및 예외 처리 추가)
-        try {
-          // Bark 모델은 프롬프트 앞에 [music] 태그를 달아주면 음악성 사운드를 생성합니다.
-          const audioPrompt = `[music] ${prompt}`; 
-          let blob;
-          
-          if (typeof hf.textToAudio === 'function') {
-            blob = await hf.textToAudio({
-              model: 'suno/bark-small', // 💡 현재 가장 안정적인 무료 오디오 모델
-              inputs: audioPrompt,
-            });
-          } else {
-            blob = await hf.textToSpeech({
-              model: 'suno/bark-small',
-              inputs: audioPrompt,
-            });
-          }
-          buffer = await blob.arrayBuffer();
-          mimeType = blob.type || 'audio/wav';
-          
-        } catch (audioErr) {
-          // 💡 허깅페이스 서버가 닫혀있을 때를 대비한 방어 코드
-          console.error("[HF Audio Error]", audioErr);
-          throw new Error("현재 Hugging Face 무료 오디오 생성 서버의 자원이 모두 사용 중입니다. 잠시 후 다시 시도해주세요.");
-        }
+      const text = await r.text();
+      if (!r.ok) {
+        return json({ error: "Groq 호출 실패", details: text }, r.status);
       }
 
-      if (buffer.byteLength < 1000) throw new Error("생성된 데이터가 너무 작습니다. (생성 실패)");
-
-      // 바이너리를 서버에서 바로 Data URL(Base64)로 인코딩
-      const base64String = encode(buffer);
-      const dataUrl = `data:${mimeType};base64,${base64String}`;
-
-      // JSON 형태로 안전하게 프론트엔드로 전달
-      return new Response(JSON.stringify({ url: dataUrl }), {
-        headers: {
-          ...corsHeaders,
-          "Content-Type": "application/json"
-        }
+      // Groq 원문 그대로 반환
+      return new Response(text, {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-  } catch (error) {
-    console.error("[System Error]", error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 400,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    // 2) IMAGE (HF Inference - FLUX)
+    if (type === "image") {
+      const hfToken = Deno.env.get("HF_TOKEN");
+      if (!hfToken) return json({ error: "HF_TOKEN이 설정되어 있지 않습니다." }, 500);
+      if (typeof prompt !== "string" || !prompt.trim()) {
+        return json({ error: "image 타입은 prompt 문자열이 필요합니다." }, 400);
+      }
+
+      const hf = new HfInference(hfToken);
+      const blob = await hf.textToImage({
+        model: "black-forest-labs/FLUX.1-schnell",
+        inputs: prompt,
+      });
+
+      const buffer = await blob.arrayBuffer();
+      if (buffer.byteLength < 1000) {
+        return json({ error: "이미지 데이터가 너무 작습니다(실패 가능)." }, 502);
+      }
+
+      const mimeType = blob.type || "image/jpeg";
+      const base64String = encode(new Uint8Array(buffer));
+      const dataUrl = `data:${mimeType};base64,${base64String}`;
+
+      return json({ url: dataUrl }, 200);
+    }
+
+    // 3) MUSIC은 프론트에서 HF Spaces(Gradio)로 처리 (무료 데모용)
+    if (type === "music") {
+      return json(
+        {
+          error: "music은 현재 무료 데모 모드로 프론트에서 HF Spaces를 직접 호출합니다.",
+          hint: "프론트 generateMusicFree() 사용",
+        },
+        400
+      );
+    }
+
+    return json({ error: `지원하지 않는 type: ${type}` }, 400);
+  } catch (e) {
+    console.error("[ai-proxy] error:", e);
+    return json({ error: e?.message ?? String(e) }, 500);
   }
-})
+});

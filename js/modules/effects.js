@@ -193,24 +193,8 @@ function initHorizontalScroll() {
                 invalidateOnRefresh: true
             });
 
-            // [핵심] 마우스 휠을 수평 스크롤로 강제 변환
-            projectsSection.addEventListener('wheel', (e) => {
-                // 섹션이 화면에 고정된 상태일 때(정상 작동 범위), 휠 동작을 캡처하여 가로로 보냄
-                const progress = st.progress;
-
-                // 트랙의 시작이 아니거나 끝이 아닐 때, 혹은 시작에서 내려가려 하거나 끝에서 올라오려 할 때
-                if ((progress > 0 && progress < 1) || (progress === 0 && e.deltaY > 0) || (progress === 1 && e.deltaY < 0)) {
-                    // 기본 스크롤을 막고 수동으로 스크롤 위치를 조정하여 ScrollTrigger를 구동
-                    e.preventDefault();
-
-                    // 스크롤 속도 최적화: deltaY를 직접 사용하되, 너무 느리면 배율 조정 가능 (현재는 1.0)
-                    const scrollMultiplier = 3.0; // 속도를 대폭 상향
-                    window.scrollBy({
-                        top: e.deltaY * scrollMultiplier,
-                        behavior: 'auto'
-                    });
-                }
-            }, { passive: false });
+            // 마우스 휠 수동 변환 (e.preventDefault()와 scrollBy) 방식은 특정 트랙패드나 브라우저에서 스크롤 끊김(Jank)을 발생시킬 수 있어 제거하고,
+            // GSAP ScrollTrigger의 기본 scrub 기능을 신뢰하여 자연스러운 스크롤 경험(Native Scroll)을 제공하도록 개선했습니다.
 
             // 레이아웃 변경 시 리프레시
             window.addEventListener('resize', () => {
