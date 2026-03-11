@@ -53,7 +53,7 @@
 
 /* 검색 입력창 스타일 */
 .board-search input {
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     color: var(--text-primary);
     padding: 0.6rem 1.2rem;
@@ -79,7 +79,7 @@
 
 /* 개별 프로젝트 카드 스타일 */
 .board-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
     padding: 1.8rem;
@@ -108,9 +108,8 @@
 /* 카드 호버 시 애니메이션 효과 */
 .board-card:hover {
     transform: translateY(-8px);
-    background: rgba(255, 255, 255, 0.06);
     border-color: var(--neon-blue);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 15px 35px var(--neon-blue-glow);
 }
 
 .board-card:hover::before {
@@ -130,7 +129,7 @@
 .card-title {
     font-size: 1.4rem;
     margin: 0;
-    color: white;
+    color: var(--text-primary);
     font-family: var(--font-heading);
 }
 

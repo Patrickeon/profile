@@ -136,7 +136,7 @@ a:hover {
 /* Glitch Effect applied via JS */
 .glitch-text.active-glitch {
     animation: glitch-anim 0.2s linear infinite;
-    color: #fff;
+    color: var(--text-primary);
     text-shadow: 2px 0 var(--neon-purple), -2px 0 var(--neon-blue);
 }
 
@@ -372,7 +372,7 @@ a:hover {
     -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
-    color: #fff;
+    color: var(--text-primary);
     font-family: var(--font-heading);
     font-weight: 500;
     font-size: 0.95rem;
@@ -570,7 +570,7 @@ a:hover {
     overflow: hidden;
     position: relative;
     /* Important for horizontal scroll pinning */
-    background: rgba(0, 0, 0, 0.2);
+    background: var(--bg-dark);
 }
 
 .timeline-container {
@@ -598,9 +598,10 @@ a:hover {
     /* Transition handled by Vanilla-tilt for transform, but add color transitions here */
     transition: box-shadow 0.3s ease, border-color 0.3s ease;
     /* Specific glass overrides for cards */
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    background: var(--glass-bg);
+    border-top: 1px solid var(--glass-border);
+    border-left: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
 }
 
 .project-card:hover {
@@ -625,7 +626,7 @@ a:hover {
 .project-desc {
     font-size: 1rem;
     margin-bottom: 0;
-    color: #ccc;
+    color: var(--text-secondary);
 }
 
 /* Chat Container styling (Terminal Look) */
@@ -716,13 +717,18 @@ a:hover {
 .message-bubble {
     padding: 1rem;
     border-radius: 8px;
-    background: rgba(15, 15, 15, 0.9);
-    /* Solider background for visibility */
+    background: rgba(20, 20, 30, 0.85);
     border: 1px solid var(--glass-border);
     font-size: 1rem;
     line-height: 1.5;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     color: var(--text-primary);
+}
+
+[data-theme="light"] .message-bubble {
+    background: rgba(255, 255, 255, 0.92);
+    color: #1a202c;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .ai-message .message-bubble {
@@ -731,7 +737,12 @@ a:hover {
 
 .user-message .message-bubble {
     border-right: 3px solid var(--neon-purple);
-    background: rgba(157, 0, 255, 0.1);
+    background: rgba(157, 0, 255, 0.12);
+}
+
+[data-theme="light"] .user-message .message-bubble {
+    background: rgba(122, 0, 204, 0.08);
+    color: #1a202c;
 }
 
 /* Chat Input Area (Fixed Bottom) */
@@ -739,8 +750,8 @@ a:hover {
     display: flex;
     align-items: center;
     padding: 1.5rem 2rem;
-    background: rgba(0, 0, 0, 0.4);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--glass-bg);
+    border-top: 1px solid var(--glass-border);
 }
 
 .prompt {
