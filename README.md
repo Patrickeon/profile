@@ -38,7 +38,9 @@
    npx serve .
    ```
 2. **필수 설정:**
-   - `js/main.js`의 `emailjs.init("YOUR_PUBLIC_KEY")` 및 `emailjs.send(...)` 부분을 본인의 키로 교체하세요.
+   - `js/main-modular.js`의 Supabase URL 및 키를 본인의 Supabase 프로젝트 자격 증명으로 교체하세요.
+   - `js/modules/ai-assistant.js`의 Hugging Face 토큰을 본인의 토큰으로 교체하세요.
+   - `js/modules/contact.js`의 EmailJS 서비스 ID, 템플릿 ID 및 공개 키를 본인의 EmailJS 자격 증명으로 교체하세요.
    - `assets/images/profile.jpg`에 본인의 사진을 추가하세요.
 
 ## 📖 Deployment

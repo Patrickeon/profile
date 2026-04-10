@@ -3,7 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <title>Patrick | Full-Stack AI Engineer Portfolio</title>
     <meta name="description" content="8년 차 개발자 Patrick의 포트폴리오입니다. AI, LLM, Web 개발 프로젝트와 기술 스택을 확인해 보세요.">
     <meta name="keywords" content="개발자 포트폴리오, Full-Stack, AI Engineer, LLM, RAG, Patrick, 김건훈">
@@ -30,29 +32,32 @@
 </head>
 
 <body>
+    <!-- Skip to Content Link -->
+    <a href="#main-content" class="skip-link">메인 콘텐츠로 건너뛰기</a>
+
     <!-- Persistent Background Container -->
     <div id="particle-canvas" class="background-canvas"></div>
 
     <!-- Floating Table of Contents (TOC) -->
-    <nav class="toc-sidebar">
-        <ul class="toc-list">
-            <li class="toc-item active" data-section="hero">
+    <nav class="toc-sidebar" aria-label="메인 네비게이션">
+        <ul class="toc-list" role="menubar">
+            <li class="toc-item active" data-section="hero" role="menuitem" aria-current="true">
                 <span class="toc-dot"></span>
                 <span class="toc-label">00. LOGON</span>
             </li>
-            <li class="toc-item" data-section="about">
+            <li class="toc-item" data-section="about" role="menuitem">
                 <span class="toc-dot"></span>
                 <span class="toc-label">01. ABOUT</span>
             </li>
-            <li class="toc-item" data-section="projects">
+            <li class="toc-item" data-section="projects" role="menuitem">
                 <span class="toc-dot"></span>
                 <span class="toc-label">02. TIMELINE</span>
             </li>
-            <li class="toc-item" data-section="project-board">
+            <li class="toc-item" data-section="project-board" role="menuitem">
                 <span class="toc-dot"></span>
                 <span class="toc-label">03. ARCHIVE</span>
             </li>
-            <li class="toc-item" data-section="contact">
+            <li class="toc-item" data-section="contact" role="menuitem">
                 <span class="toc-dot"></span>
                 <span class="toc-label">04. CONTACT</span>
             </li>
@@ -60,7 +65,7 @@
     </nav>
 
     <!-- Main Content Wrapper -->
-    <main class="app-container">
+    <main class="app-container" id="main-content">
 
         <!-- Section 1: Hero / Intro -->
         <section id="hero" class="section hero-section">
@@ -93,6 +98,8 @@
                         <div class="profile-image-container">
                             <!-- TODO: assets/images/profile.jpg에 실제 사진을 넣어주세요 -->
                             <img src="assets/images/profile.jpg" alt="Patrick Profile" class="profile-img"
+                                loading="lazy"
+                                decode="async"
                                 onerror="this.style.display='none'">
                             <span class="profile-name-overlay">PATRICK</span>
                         </div>
@@ -115,48 +122,52 @@
 
                         <!-- Skill Nodes (Massive Tech Stack) -->
                         <!-- Languages -->
-                        <div class="skill-node type-lang" data-id="java" data-connects-to="spring,springboot,jsp">Java
+                        <div class="skill-node type-lang" data-id="java" data-connects-to="spring,springboot,jsp" data-proficiency="90">Java
                         </div>
-                        <div class="skill-node type-lang" data-id="python" data-connects-to="flowise">Python</div>
+                        <div class="skill-node type-lang" data-id="python" data-connects-to="flowise" data-proficiency="80">Python</div>
                         <div class="skill-node type-lang" data-id="javascript"
-                            data-connects-to="nodejs,vuejs,reactjs,sveltejs,jquery,meteorjs">JavaScript</div>
-                        <div class="skill-node type-lang" data-id="jsp" data-connects-to="java">JSP</div>
+                            data-connects-to="nodejs,vuejs,reactjs,sveltejs,jquery,meteorjs" data-proficiency="95">JavaScript</div>
+                        <div class="skill-node type-lang" data-id="jsp" data-connects-to="java" data-proficiency="75">JSP</div>
 
                         <!-- Backend & Frameworks -->
                         <div class="skill-node type-fw" data-id="springboot"
-                            data-connects-to="java,mysql,mariadb,oracle,mongodb">Spring Boot</div>
-                        <div class="skill-node type-fw" data-id="spring" data-connects-to="java">Spring</div>
-                        <div class="skill-node type-fw" data-id="nodejs" data-connects-to="javascript,mongodb,graphql">
-                            Node.js</div>
-                        <div class="skill-node type-fw" data-id="meteorjs" data-connects-to="javascript,mongodb">
-                            Meteor.js</div>
-                        <div class="skill-node type-fw" data-id="graphql" data-connects-to="apollo,nodejs">GraphQL</div>
-                        <div class="skill-node type-fw" data-id="apollo" data-connects-to="graphql">Apollo Server</div>
+                            data-connects-to="java,mysql,mariadb,oracle,mongodb" data-proficiency="85">Spring Boot</div>
+                        <div class="skill-node type-fw" data-id="spring" data-connects-to="java" data-proficiency="80">Spring</div>
+                        <div class="skill-node type-fw" data-id="nodejs" data-connects-to="javascript,mongodb,graphql" data-proficiency="80">Node.js</div>
+                        <div class="skill-node type-fw" data-id="meteorjs" data-connects-to="javascript,mongodb" data-proficiency="65">Meteor.js</div>
+                        <div class="skill-node type-fw" data-id="graphql" data-connects-to="apollo,nodejs" data-proficiency="60">GraphQL</div>
+                        <div class="skill-node type-fw" data-id="apollo" data-connects-to="graphql" data-proficiency="55">Apollo Server</div>
 
                         <!-- Frontend -->
-                        <div class="skill-node type-fw" data-id="vuejs" data-connects-to="javascript">Vue.js</div>
-                        <div class="skill-node type-fw" data-id="reactjs" data-connects-to="javascript,reactnative">
-                            React.js</div>
-                        <div class="skill-node type-fw" data-id="sveltejs" data-connects-to="javascript">Svelte.js</div>
-                        <div class="skill-node type-fw" data-id="jquery" data-connects-to="javascript">jQuery</div>
+                        <div class="skill-node type-fw" data-id="vuejs" data-connects-to="javascript" data-proficiency="75">Vue.js</div>
+                        <div class="skill-node type-fw" data-id="reactjs" data-connects-to="javascript,reactnative" data-proficiency="80">React.js</div>
+                        <div class="skill-node type-fw" data-id="sveltejs" data-connects-to="javascript" data-proficiency="60">Svelte.js</div>
+                        <div class="skill-node type-fw" data-id="jquery" data-connects-to="javascript" data-proficiency="70">jQuery</div>
 
                         <!-- Mobile -->
-                        <div class="skill-node type-mobile" data-id="flutter" data-connects-to="">Flutter</div>
-                        <div class="skill-node type-mobile" data-id="reactnative" data-connects-to="reactjs,expo">React
-                            Native</div>
-                        <div class="skill-node type-mobile" data-id="expo" data-connects-to="reactnative">Expo</div>
+                        <div class="skill-node type-mobile" data-id="flutter" data-connects-to="" data-proficiency="60">Flutter</div>
+                        <div class="skill-node type-mobile" data-id="reactnative" data-connects-to="reactjs,expo" data-proficiency="65">React Native</div>
+                        <div class="skill-node type-mobile" data-id="expo" data-connects-to="reactnative" data-proficiency="60">Expo</div>
 
                         <!-- Databases -->
-                        <div class="skill-node type-db" data-id="mysql" data-connects-to="springboot">MySQL</div>
-                        <div class="skill-node type-db" data-id="mariadb" data-connects-to="springboot">MariaDB</div>
-                        <div class="skill-node type-db" data-id="oracle" data-connects-to="springboot">Oracle</div>
-                        <div class="skill-node type-db" data-id="mongodb" data-connects-to="nodejs,meteorjs">MongoDB
+                        <div class="skill-node type-db" data-id="mysql" data-connects-to="springboot" data-proficiency="75">MySQL</div>
+                        <div class="skill-node type-db" data-id="mariadb" data-connects-to="springboot" data-proficiency="65">MariaDB</div>
+                        <div class="skill-node type-db" data-id="oracle" data-connects-to="springboot" data-proficiency="80">Oracle</div>
+                        <div class="skill-node type-db" data-id="mongodb" data-connects-to="nodejs,meteorjs" data-proficiency="75">MongoDB
                         </div>
-                        <div class="skill-node type-db" data-id="neo4j" data-connects-to="">Neo4j</div>
+                        <div class="skill-node type-db" data-id="neo4j" data-connects-to="" data-proficiency="55">Neo4j</div>
 
                         <!-- AI & Tools -->
-                        <div class="skill-node type-ai-tool" data-id="n8n" data-connects-to="">n8n</div>
-                        <div class="skill-node type-ai-tool" data-id="flowise" data-connects-to="python">Flowise</div>
+                        <div class="skill-node type-ai-tool" data-id="n8n" data-connects-to="" data-proficiency="60">n8n</div>
+                        <div class="skill-node type-ai-tool" data-id="flowise" data-connects-to="python" data-proficiency="55">Flowise</div>
+                    </div>
+                </div>
+
+                <!-- Career Timeline -->
+                <div class="career-timeline-container">
+                    <h3 class="career-timeline-title">Career Progression</h3>
+                    <div class="career-timeline">
+                        <!-- Career periods will be dynamically generated -->
                     </div>
                 </div>
             </div>
@@ -169,67 +180,67 @@
             <div class="timeline-container">
                 <div class="timeline-track">
                     <!-- Project Cards (13 Real Projects) -->
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2012-2013</div>
                         <h3 class="project-title">공정 자동화 설비</h3>
                         <p class="project-desc">[㈜JBL]<br>C, PLC, Window 기반 개발</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2016</div>
                         <h3 class="project-title">ABL 화상 고객 서비스</h3>
                         <p class="project-desc">[ABL]<br>Java, MariaDB, MongoDB</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2016-2017</div>
                         <h3 class="project-title">JB(전북은행) 통합 솔루션 구축</h3>
                         <p class="project-desc">[전북은행]<br>Java, MariaDB, MongoDB</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2017-2019</div>
                         <h3 class="project-title">AI 챗봇 솔루션 개발 및 구축</h3>
                         <p class="project-desc">[롯데카드/우리카드/CJ오쇼핑]<br>Java, Meteor</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2021</div>
                         <h3 class="project-title">㈜살방 구축 서비스</h3>
                         <p class="project-desc">[플로리보스_살방]<br>JS, React Native, Expo, GraphQL, PostgreSQL</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2022-2023</div>
                         <h3 class="project-title">AGING LOC Digital Healthcare App</h3>
                         <p class="project-desc">[㈜메디아이오티]<br>Java, Flutter, Meteor</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2023-2024</div>
                         <h3 class="project-title">STO 플랫폼 (ST Galaxia)</h3>
                         <p class="project-desc">[㈜갤럭시아머니트리]<br>JS, jQuery, Java</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2024</div>
                         <h3 class="project-title">SBL G.AI 문서표준화플랫폼 구축</h3>
                         <p class="project-desc">[㈜삼성바이오로직스]<br>Java, Spring, Vue.js</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2024-2025</div>
                         <h3 class="project-title">Gen AI 페르소나 자체 솔루션 개발</h3>
                         <p class="project-desc">[페르소나 AI]<br>Java, Spring Boot, Vue.js</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2025</div>
                         <h3 class="project-title">코닝정밀소재 AI 문서표준화</h3>
                         <p class="project-desc">[페르소나 AI]<br>Java, Spring Boot, Vue.js</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2025</div>
                         <h3 class="project-title">Keris 한국교육학술정보원</h3>
                         <p class="project-desc">[페르소나 AI]<br>Java, Spring Boot, Vue.js</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2025</div>
                         <h3 class="project-title">세라젬 LLM 챗봇 프로젝트</h3>
                         <p class="project-desc">[페르소나 AI]<br>Java, Spring Boot, Vue.js</p>
                     </div>
-                    <div class="project-card glass-panel" data-tilt>
+                    <div class="project-card glass-panel" data-tilt role="button" tabindex="0">
                         <div class="project-year">2025-2026</div>
                         <h3 class="project-title">하나캐피탈 LLM 챗봇 프로젝트</h3>
                         <p class="project-desc">[페르소나 AI]<br>Java, Spring Boot, JSP, jQuery</p>
@@ -271,6 +282,7 @@
                 </div>
                 <div class="chat-input-area">
                     <span class="prompt">></span>
+                    <label for="chat-input" class="sr-only">채팅 입력 필드</label>
                     <input type="text" id="chat-input" class="chat-input" placeholder="메시지를 입력하세요 (Press Enter)..."
                         autocomplete="off">
                 </div>
@@ -294,6 +306,7 @@
                     </div>
                 </div>
                 <div class="ai-chat-input-container">
+                    <label for="ai-chat-input" class="sr-only">AI 어시스턴트 입력 필드</label>
                     <input type="text" class="ai-chat-input" id="ai-chat-input" data-i18n="ai.placeholder" placeholder="질문을 입력하세요...">
                 </div>
             </div>

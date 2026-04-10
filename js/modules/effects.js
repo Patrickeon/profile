@@ -9,6 +9,8 @@ export function initEffects() {
     initSkillGraph();
     initHorizontalScroll();
     initVanillaTilt();
+    initAccessibilityEnhancements();
+    initCareerTimeline();
 }
 
 /**
@@ -137,6 +139,37 @@ function initSkillGraph() {
         setTimeout(drawLinks, 100);
         window.addEventListener('resize', drawLinks);
 
+        // Add proficiency indicators and tooltips to skill nodes
+        nodes.forEach(node => {
+            // Add proficiency dots
+            const proficiency = parseInt(node.dataset.proficiency) || 0;
+            const proficiencyDots = document.createElement('div');
+            proficiencyDots.className = 'skill-proficiency';
+
+            // Create 5 dots representing 20% increments
+            for (let i = 0; i < 5; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'proficiency-dot';
+                if (proficiency > (i + 1) * 20) {
+                    dot.classList.add('active');
+                }
+                proficiencyDots.appendChild(dot);
+            }
+            node.appendChild(proficiencyDots);
+
+            // Add tooltip
+            const tooltip = document.createElement('div');
+            tooltip.className = 'skill-tooltip';
+            tooltip.innerHTML = `
+                <div class="tooltip-title">${node.textContent.trim()}</div>
+                <div class="tooltip-proficiency">Proficiency: ${proficiency}%</div>
+                <div class="tooltip-bar">
+                    <div class="tooltip-bar-fill" style="width: ${proficiency}%"></div>
+                </div>
+            `;
+            node.appendChild(tooltip);
+        });
+
         nodes.forEach(node => {
             node.addEventListener('mouseenter', () => {
                 skillGraph.classList.add('has-active-node');
@@ -221,4 +254,177 @@ function initVanillaTilt() {
             "max-glare": 0.3
         });
     }
+}
+
+/**
+ * 6. 접근성 향상 - 키보드_navigability 및 상호작용
+ */
+function initAccessibilityEnhancements() {
+    // 프로젝트 카드 접근성 향상 (Enter/Space 키로 활성화)
+    const projectCards = document.querySelectorAll('.project-card[role="button"]');
+
+    projectCards.forEach(card => {
+        // 키보드 이벤트 처리 (Enter 및 Space 키)
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault(); // 페이지 스크롤 방지
+                card.click(); // 클릭 이벤트 트리거
+            }
+        });
+
+        // 시각적 피드백을 위한 포커스 스타일 추가
+        card.addEventListener('focus', () => {
+            card.style.boxShadow = '0 0 0 3px rgba(0, 243, 255, 0.5)';
+        });
+
+        card.addEventListener('blur', () => {
+            card.style.boxShadow = '';
+        });
+    });
+}
+
+function initCareerTimeline() {
+    const careerTimeline = document.querySelector('.career-timeline');
+    if (!careerTimeline) return;
+
+    // Clear existing content
+    careerTimeline.innerHTML = '';
+
+    // Add center line
+    const centerLine = document.createElement('div');
+    centerLine.className = 'career-timeline-line';
+    careerTimeline.appendChild(centerLine);
+
+    // 경력 데이터 정의
+    const careerData = [
+        {
+            year: '2012-2013',
+            title: 'Embedded Systems Engineer',
+            company: '(주)JBL',
+            description: 'PLC 기반 공정 자동화 설비 개발 및 유지보수',
+            technologies: ['C', 'PLC', 'Windows'],
+            side: 'left'
+        },
+        {
+            year: '2016',
+            title: 'Full Stack Developer',
+            company: 'ABL',
+            description: '화상 고객 서비스 시스템 개발',
+            technologies: ['Java', 'MariaDB', 'MongoDB'],
+            side: 'right'
+        },
+        {
+            year: '2016-2017',
+            title: 'Senior Java Developer',
+            company: '전북은행 (JB Bank)',
+            description: '통합 금융 솔루션 구축 및 아키텍처 설계',
+            technologies: ['Java', 'MariaDB', 'MongoDB'],
+            side: 'left'
+        },
+        {
+            year: '2017-2019',
+            title: 'AI Chatbot Solution Architect',
+            company: '롯데카드/우리카드/CJ오쇼핑',
+            description: '대형 AI 챗봇 솔루션 개발 및 구축',
+            technologies: ['Java', 'Meteor.js'],
+            side: 'right'
+        },
+        {
+            year: '2021',
+            title: 'Mobile App Developer',
+            company: '플로리보스_살방',
+            description: '라이프스타일 커뮤니티 앱 구축',
+            technologies: ['JavaScript', 'React Native', 'Expo', 'GraphQL', 'PostgreSQL'],
+            side: 'left'
+        },
+        {
+            year: '2022-2023',
+            title: 'Healthcare Systems Engineer',
+            company: '(주)메디아이오티',
+            description: '디지털 헬스케어 앱 개발 (Flutter 기반)',
+            technologies: ['Java', 'Flutter', 'Meteor.js'],
+            side: 'right'
+        },
+        {
+            year: '2023-2024',
+            title: 'Blockchain Developer',
+            company: '(주)갤럭시아머니트리',
+            description: 'STO 플랫폼 (ST Galaxia) 개발',
+            technologies: ['JavaScript', 'jQuery', 'Java'],
+            side: 'left'
+        },
+        {
+            year: '2024',
+            title: 'Enterprise AI Platform Engineer',
+            company: '(주)삼성바이오로직스',
+            description: 'G.AI 문서표준화 플랫폼 구축',
+            technologies: ['Java', 'Spring', 'Vue.js'],
+            side: 'right'
+        },
+        {
+            year: '2024-2025',
+            title: 'Lead AI Engineer',
+            company: '페르소나 AI',
+            description: 'Gen AI 페르소나 솔루션 자체 개발',
+            technologies: ['Java', 'Spring Boot', 'Vue.js'],
+            side: 'left'
+        },
+        {
+            year: '2025',
+            title: 'AI Document Processing Engineer',
+            company: '페르소나 AI',
+            description: '코닝정밀소재 AI 문서표준화 솔루션 개발',
+            technologies: ['Java', 'Spring Boot', 'Vue.js'],
+            side: 'right'
+        },
+        {
+            year: '2025',
+            title: 'Education AI Specialist',
+            company: '페르소나 AI',
+            description: '한국교육학술정보원(KERIS) LLM 챗봇 프로젝트',
+            technologies: ['Java', 'Spring Boot', 'Vue.js'],
+            side: 'left'
+        },
+        {
+            year: '2025',
+            title: 'Healthcare AI Developer',
+            company: '페르소나 AI',
+            description: '세라젬 LLM 챗봇 프로젝트 개발',
+            technologies: ['Java', 'Spring Boot', 'Vue.js'],
+            side: 'right'
+        },
+        {
+            year: '2025-2026',
+            title: 'Senior AI Consultant',
+            company: '페르소나 AI',
+            description: '하나캐피탈 LLM 챗봇 프로젝트 리드',
+            technologies: ['Java', 'Spring Boot', 'JSP', 'jQuery'],
+            side: 'left'
+        }
+    ];
+
+    careerData.forEach((period, index) => {
+        const periodElement = document.createElement('div');
+        periodElement.className = `career-period ${period.side}`;
+
+        // Calculate position based on index to distribute evenly
+        const totalPeriods = careerData.length;
+        const positionPercent = ((index + 1) / (totalPeriods + 1)) * 100;
+        periodElement.style.top = `${positionPercent}%`;
+
+        periodElement.innerHTML = `
+            <div class="career-period dot"></div>
+            <div class="career-period content">
+                <div class="career-year">${period.year}</div>
+                <div class="career-title">${period.title}</div>
+                <div class="career-company">${period.company}</div>
+                <div class="career-description">${period.description}</div>
+                <div class="career-technologies">
+                    ${period.technologies.map(tech => `<span class="career-tech-tag">${tech}</span>`).join('')}
+                </div>
+            </div>
+        `;
+
+        careerTimeline.appendChild(periodElement);
+    });
 }

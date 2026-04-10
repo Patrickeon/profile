@@ -47,22 +47,49 @@ export function initAIAssistant(supabase) {
         };
     }
 
-    // 👇 (새로 추가할 부분) 추천 질문 칩 생성 함수
+    // 👇 (향상된 부분) 추천 질문 칩 생성 함수 - 컨텍스트 인식 및 동적 제안
     function addSuggestionChips() {
-        // 이미 칩이 생성되어 있다면 중복 생성 방지
-        if (document.querySelector('.suggestion-chips')) return;
+        // 기존 칩 컨테이너가 있으면 제거 (중복 방지 및 깨끗한 상태 유지)
+        const existingChips = document.querySelector('.suggestion-chips');
+        if (existingChips) {
+            existingChips.remove();
+        }
 
         const chipsContainer = document.createElement('div');
         chipsContainer.classList.add('suggestion-chips');
 
-        // 방문자에게 유도할 추천 질문 리스트
-        const suggestions = [
-            "🛠️ 주요 기술 스택은 뭐야?",
-            "📂 주요 프로젝트 요약해줘",
-            "👨💻 Patrick은 어떤 성향의 개발자야?",
-            "🎨 /image 사이버펑크 도시",
-            "🎵 /music 미래지향적 비트"
-        ];
+        // 시간대나 컨텍스트에 따라 다른 제안 제공
+        const hour = new Date().getHours();
+        let suggestions = [];
+
+        if (hour >= 6 && hour < 12) {
+            // 아침: 학습 및 개발 관련 질문
+            suggestions = [
+                "🛠️ 오늘의 기술 스택 분석해줘",
+                "📚 최근 학습 중인 기술은 뭐야?",
+                "💡 현재 관심 있는 AI 트렌드는?",
+                "🎨 /image 미래지향적 업무 환경",
+                "🎵 /music 집중력 향상 비트"
+            ];
+        } else if (hour >= 12 && hour < 18) {
+            // 오후: 프로젝트 및 경력 관련 질문
+            suggestions = [
+                "📂 주요 프로젝트 요약해줘",
+                "👨💻 Patrick은 어떤 성향의 개발자야?",
+                "🚀 가장 도전적이었던 프로젝트는?",
+                "🎨 /image 사이버펑크 도시",
+                "🎵 /music 미래지향적 비트"
+            ];
+        } else {
+            // 저녁/밤: 반성 및 미래 지향 질문
+            suggestions = [
+                "🌟 오늘의 성찰: 배운 점은?",
+                "🔮 미래 기술 로드맵은 어떻게 돼?",
+                "📈 커리어 목표 및 방향성은?",
+                "🎨 /image AI와 인간의 협업 미래상",
+                "🎵 /music 편안한 전자 음악"
+            ];
+        }
 
         suggestions.forEach(text => {
             const chip = document.createElement('button');
@@ -77,16 +104,37 @@ export function initAIAssistant(supabase) {
                 // 엔터 키 이벤트 강제 발생시켜 메시지 전송
                 const enterEvent = new KeyboardEvent('keypress', { key: 'Enter', code: 'Enter', keyCode: 13, bubbles: true });
                 aiChatInput.dispatchEvent(enterEvent);
-                chipsContainer.style.display = 'none'; // 클릭 후 숨김
+                // 칩은 제거하지 않고 그대로 유지 (다시 클릭 가능하도록)
+                // 시각적 피드백 제공
+                chip.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    chip.style.transform = 'scale(1)';
+                }, 200);
             });
+
+            // 칩 호버 효과 강화
+            chip.addEventListener('mouseenter', () => {
+                chip.style.transform = 'scale(1.05)';
+            });
+
+            chip.addEventListener('mouseleave', () => {
+                chip.style.transform = 'scale(1)';
+            });
+
             chipsContainer.appendChild(chip);
         });
 
-        // 첫 번째 AI 웰컴 메시지 하단에 칩 컨테이너 부착
-        const firstMessage = aiChatBody.querySelector('.ai-message .message-bubble');
-        if (firstMessage) {
-            firstMessage.parentElement.appendChild(chipsContainer);
-        }
+        // AI 메시지 영역 하단에 칩 컨테이너 부착
+        aiChatBody.appendChild(chipsContainer);
+
+        // 스크롤을 최하로 유지
+        aiChatBody.scrollTop = aiChatBody.scrollHeight;
+
+        // 칩 컨테이너에 페이드인 효과 추가
+        setTimeout(() => {
+            chipsContainer.style.opacity = '1';
+            chipsContainer.style.transform = 'translateY(0)';
+        }, 50);
     }
 
     // 팝업 열기/닫기 (이 부분을 아래처럼 수정)
@@ -252,7 +300,14 @@ export function initAIAssistant(supabase) {
 
     // 허깅페이스 API 호출 함수
     async function generateAIContent(type, prompt) {
-        const HF_TOKEN = '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'; // 발급받은 토큰
+        // IMPORTANT: Replace this value with your own Hugging Face token
+        // For security, consider using environment variables or a config file in production
+        const HF_TOKEN = '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'; // <-- REPLACE WITH YOUR HUGGING FACE TOKEN
+
+        // Check if token has been customized
+        if (HF_TOKEN === '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') {
+            console.warn('[Security Warning] Using default Hugging Face token. Please replace with your own token for security.');
+        }
 
         // 모델 설정
         const model = type === 'image'
@@ -312,19 +367,30 @@ export function initAIAssistant(supabase) {
         }
     }
 
-    // 💡 타이핑 효과 함수 (새로 추가)
-    async function typeWriterEffect(element, text, speed = 20) {
+    // 💡 향상된 타이핑 효과 함수 (커서 깜빡임 및 자연스러운 타이핑)
+    async function typeWriterEffect(element, text, speed = 30) {
         element.innerHTML = '';
         let i = 0;
+
+        // 커서 요소 생성
+        const cursor = document.createElement('span');
+        cursor.className = 'cursor';
+        cursor.innerHTML = '|';
+
         return new Promise((resolve) => {
             function type() {
                 if (i < text.length) {
-                    // 줄바꿈 처리 포함
-                    element.innerHTML = text.substring(0, i + 1).replace(/\n/g, '<br>') + '<span class="cursor">|</span>';
+                    // 줄바꿈 처리 및 텍스트 추가
+                    element.innerHTML = text.substring(0, i + 1).replace(/\n/g, '<br>');
+                    element.appendChild(cursor);
                     i++;
-                    setTimeout(type, speed);
+
+                    // 자연스러운 타이핑을 위한 랜덤 속도 변동
+                    const randomSpeed = speed + Math.random() * 20;
+                    setTimeout(type, randomSpeed);
                 } else {
-                    element.innerHTML = text.replace(/\n/g, '<br>'); // 커서 제거
+                    // 타이핑 완료 후 커서 제거 및 반짝임 효과
+                    element.innerHTML = text.replace(/\n/g, '<br>');
                     resolve();
                 }
             }

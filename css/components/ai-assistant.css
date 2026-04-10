@@ -219,6 +219,20 @@
     margin-top: 2px;
 }
 
+/* 타이핑 커서 효과 */
+.cursor {
+    display: inline-block;
+    width: 2px;
+    margin-left: 2px;
+    background-color: var(--neon-blue);
+    animation: cursorBlink 0.8s ease-in-out infinite;
+}
+
+@keyframes cursorBlink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
 /* --- AI Suggestion Chips (추천 질문 버튼) --- */
 .suggestion-chips {
     display: flex;

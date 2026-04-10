@@ -72,8 +72,22 @@ export function initContact() {
                     chatInput.placeholder = "메일 전송 중...";
                     chatInput.disabled = true;
 
-                    // EmailJS 연동 로직 (필요 시 init 호출)
+                    // EmailJS 연동 로직
                     if (window.emailjs) {
+                        // IMPORTANT: Replace these values with your own EmailJS credentials
+                        // Get these from your EmailJS dashboard: https://www.emailjs.com/
+                        const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID'; // <-- REPLACE WITH YOUR EMAILJS SERVICE ID
+                        const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID'; // <-- REPLACE WITH YOUR EMAILJS TEMPLATE ID
+                        const EMAILJS_PUBLIC_KEY = 'YOUR_PUBLIC_KEY'; // <-- REPLACE WITH YOUR EMAILJS PUBLIC KEY
+
+                        // Check if credentials have been customized
+                        if (EMAILJS_SERVICE_ID === 'YOUR_SERVICE_ID' || EMAILJS_TEMPLATE_ID === 'YOUR_TEMPLATE_ID' || EMAILJS_PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+                            console.warn('[Security Warning] Using default EmailJS credentials. Please replace with your own EmailJS service ID, template ID, and public key for the contact form to work properly.');
+                        }
+
+                        // Initialize EmailJS with your public key
+                        emailjs.init(EMAILJS_PUBLIC_KEY);
+
                         const templateParams = {
                             from_name: userData.name,
                             from_email: userData.email,
@@ -81,7 +95,7 @@ export function initContact() {
                             to_email: "01051188129e@gmail.com"
                         };
 
-                        window.emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+                        window.emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
                             .then(() => {
                                 addMessage('AI', `<span style="color:var(--neon-blue)">[SUCCESS]</span> 메일이 성공적으로 전송되었습니다.`);
                                 chatInput.placeholder = "연결이 종료되었습니다.";

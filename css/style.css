@@ -62,6 +62,34 @@
     scroll-behavior: smooth;
 }
 
+/* Skip Link Styles */
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--bg-dark);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    z-index: 1000;
+    transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+/* Screen Reader Only Styles */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
 body {
     background-color: var(--bg-dark);
     color: var(--text-primary);
@@ -251,6 +279,432 @@ a:hover {
     /* Lowest index, behind content */
     pointer-events: none;
     /* Let clicks pass through to content */
+}
+
+/* Skill Proficiency Indicators */
+.skill-proficiency {
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2px;
+    pointer-events: none;
+}
+
+.proficiency-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+
+.proficiency-dot.active {
+    background-color: var(--neon-blue);
+    transform: scale(1.2);
+}
+
+/* Skill Tooltips */
+.skill-tooltip {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: var(--glass-shadow);
+    min-width: 120px;
+    text-align: center;
+}
+
+.skill-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 4px;
+    border-style: solid;
+    border-color: var(--glass-border) transparent transparent transparent;
+}
+
+.skill-tooltip .tooltip-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--text-primary);
+}
+
+.skill-tooltip .tooltip-proficiency {
+    margin-bottom: 6px;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+}
+
+.skill-tooltip .tooltip-bar {
+    width: 100%;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.skill-tooltip .tooltip-bar-fill {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+/* Show tooltip on hover */
+.skill-node:hover .skill-tooltip {
+    opacity: 1;
+    top: -110px;
+}
+
+/* Career Timeline */
+.career-timeline-container {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: var(--glass-shadow);
+    position: relative;
+}
+
+.career-timeline-title {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.career-timeline-title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: var(--gradient-primary);
+    border-radius: 2px;
+}
+
+.career-timeline {
+    position: relative;
+    padding: 2rem 0;
+    min-height: 800px; /* Ensure enough space for all items */
+}
+
+.career-timeline-line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: rgba(0, 243, 255, 0.2);
+    transform: translateX(-50%);
+}
+
+.career-period {
+    position: absolute;
+    width: 45%;
+    padding: 1rem 2rem;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
+}
+
+.career-period.left {
+    left: 0;
+    text-align: right;
+    padding-right: 3rem;
+}
+
+.career-period.right {
+    left: 50%;
+    text-align: left;
+    padding-left: 3rem;
+}
+
+.career-period.dot {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--neon-blue);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgba(0, 243, 255, 0.2);
+    z-index: 10;
+}
+
+/* Position dots correctly based on side */
+.career-period.left .career-period.dot {
+    right: -25px;
+    left: auto;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.career-period.right .career-period.dot {
+    left: -25px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.career-period.content {
+    z-index: 5;
+    width: 100%;
+    top: 0;
+    left: 0;
+}
+
+.career-period.left .career-period.content {
+    margin-right: 3rem;
+}
+
+.career-period.right .career-period.content {
+    margin-left: 3rem;
+}
+
+.career-year {
+    font-family: var(--font-code);
+    font-size: 1.2rem;
+    color: var(--neon-purple);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.career-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.career-company {
+    font-size: 1rem;
+    color: var(--neon-blue);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.career-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+
+.career-technologies {
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.career-tech-tag {
+    display: inline-block;
+    background: rgba(0, 243, 255, 0.1);
+    color: var(--neon-blue);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    white-space: nowrap;
+}
+
+/* --- 6. Temporary/Initial Component Styles (To be refined in later phases) --- */
+
+.career-timeline-title {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.career-timeline-title::before {
+    content: '';
+    width: 4px;
+    height: 24px;
+    background: var(--gradient-primary);
+    border-radius: 2px;
+}
+
+.career-timeline {
+    position: relative;
+    padding: 2rem 0;
+}
+
+.career-timeline-line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: rgba(0, 243, 255, 0.2);
+    transform: translateX(-50%);
+}
+
+/* Keep the ::before for backward compatibility but we'll use the class instead */
+.career-timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: rgba(0, 243, 255, 0.2);
+    transform: translateX(-50%);
+}
+
+.career-period {
+    position: relative;
+    width: 50%;
+    padding: 1rem 2rem;
+    margin-bottom: 2rem;
+    /* Prevent overflow on smaller screens */
+    max-width: 45%;
+    box-sizing: border-box;
+    /* Add smooth transition for better UX */
+    transition: all 0.3s ease;
+}
+
+.career-period.left {
+    left: 0;
+    text-align: right;
+    padding-right: 3rem;
+    /* Space for the line and dot */
+    /* Add smooth transition for better UX */
+    transition: all 0.3s ease;
+}
+
+.career-period.right {
+    left: 50%;
+    text-align: left;
+    padding-left: 3rem;
+    /* Space for the line and dot */
+    /* Add smooth transition for better UX */
+    transition: all 0.3s ease;
+}
+
+.career-period.dot {
+    position: absolute;
+    top: 50%;
+    /* For left-aligned items, position dot on the right edge */
+    /* For right-aligned items, position dot on the left edge */
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    background: var(--neon-blue);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    box-shadow: 0 0 0 4px rgba(0, 243, 255, 0.2);
+}
+
+/* Override positioning for left and right sides */
+.career-period.left .career-period.dot {
+    left: calc(100% - 1px); /* Position at right edge of left side */
+}
+
+.career-period.right .career-period.dot {
+    left: 0; /* Position at left edge of right side (which is at 50% of container) */
+}
+
+.career-period.content {
+    position: relative;
+    z-index: 5;
+}
+
+/* Improve readability for longer text */
+.career-period.content * {
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+/* Limit description length to prevent overflow */
+.career-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.5;
+    max-height: 4.5rem; /* 3 lines */
+}
+
+/* Allow expanding on hover */
+.career-period.content:hover .career-description {
+    -webkit-line-clamp: unset;
+    max-height: unset;
+}
+
+/* Improve technologies tag wrapping */
+.career-technologies {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.career-tech-tag {
+    white-space: nowrap;
+}
+
+.career-year {
+    font-family: var(--font-code);
+    font-size: 1.2rem;
+    color: var(--neon-purple);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.career-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.career-company {
+    font-size: 1rem;
+    color: var(--neon-blue);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.career-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.career-technologies {
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.career-tech-tag {
+    display: inline-block;
+    background: rgba(0, 243, 255, 0.1);
+    color: var(--neon-blue);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid rgba(0, 243, 255, 0.2);
 }
 
 /* --- 6. Temporary/Initial Component Styles (To be refined in later phases) --- */
