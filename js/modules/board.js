@@ -108,19 +108,3 @@ async function renderProjects(container, supabase, filter = 'all', search = '') 
         container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff5f56;">[ERROR] 데이터 렌더링에 실패했습니다.</p>';
     }
 }
-
-        // GSAP 애니메이션 적용
-        if (window.gsap) {
-            window.gsap.fromTo('.board-card',
-                { y: 30, opacity: 0 },
-                { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power2.out' }
-            );
-        } else {
-            document.querySelectorAll('.board-card').forEach(c => c.style.opacity = '1');
-        }
-
-    } catch (err) {
-        console.error('Board Rendering Error:', err);
-        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff5f56;">[ERROR] 데이터 렌더링에 실패했습니다.</p>';
-    }
-}
