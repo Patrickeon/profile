@@ -524,16 +524,16 @@ function initCareerTimeline() {
         period.element = periodElement; // 참조 저장
     });
 
-    // 2. DOM에 렌더링된 요소의 실제 높이(offsetHeight)를 측정하여 엇갈리게(Staggered) 배치
-    // 브라우저 렌더링이 안정화될 때까지 짧은 지연시간(setTimeout) 후 위치 계산
-    setTimeout(() => {
+    // 2. 사파리 호환성을 위해 브라우저 렌더링이 완료된 후 위치를 계산합니다.
+    const calculatePositions = () => {
         let leftY = 0;
         let rightY = 100; // 우측 항목들을 초기에 100px 정도 아래로 내려서 자연스럽게 엇갈리도록 설정
         const verticalPadding = 30; // 같은 쪽(동일 측면) 카드 사이의 간격
 
         careerData.forEach((period) => {
             const el = period.element;
-            const height = el.offsetHeight;
+            // offsetHeight가 0일 경우를 대비해 최소 150px을 보장합니다.
+            const height = Math.max(el.offsetHeight, 150);
 
             if (period.side === 'left') {
                 el.style.top = `${leftY}px`;
@@ -542,9 +542,18 @@ function initCareerTimeline() {
                 el.style.top = `${rightY}px`;
                 rightY += height + verticalPadding;
             }
+            
+            // 사파리에서 카드가 즉시 보이도록 투명도 및 가속 설정
+            el.style.opacity = '1';
+            el.style.visibility = 'visible';
         });
 
         // 타임라인 컨테이너 전체 높이를 가장 아래쪽 카드의 높이에 맞춤
-        careerTimeline.style.minHeight = `${Math.max(leftY, rightY) + 50}px`;
-    }, 0);
+        careerTimeline.style.minHeight = `${Math.max(leftY, rightY) + 100}px`;
+    };
+
+    // DOM에 추가된 직후와 약간의 시간 차를 두고 실행하여 위치를 확정합니다.
+    requestAnimationFrame(() => {
+        setTimeout(calculatePositions, 150);
+    });
 }
