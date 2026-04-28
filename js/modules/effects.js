@@ -38,7 +38,8 @@ function initProjectTimeline() {
 
         // 클릭 이벤트: 모달 열기 (Project Hub와 동일한 동작)
         card.addEventListener('click', () => {
-            openModal(project.year, project.title, project.desc, project.tech);
+            const fullDesc = `[${project.company}]\n${project.desc}`;
+            openModal(project.year, project.title, fullDesc, project.tech);
         });
 
         timelineTrack.appendChild(card);

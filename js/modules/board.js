@@ -1,4 +1,5 @@
 import { projectsData } from '../data/projects-data.js';
+import { openModal } from './modal.js';
 
 export async function initProjectBoard(supabase) {
     const projectGrid = document.getElementById('project-grid');
@@ -88,7 +89,9 @@ async function renderProjects(container, supabase, filter = 'all', search = '') 
                 const project = projectsData.find(p => p.id === id);
 
                 if (project) {
-                    openModal(project.year, project.title, project.desc, project.tech);
+                    // 회사 정보를 포함하여 더 풍부한 정보 제공
+                    const fullDesc = `[${project.company}]\n${project.desc}`;
+                    openModal(project.year, project.title, fullDesc, project.tech);
                 }
             }
         };

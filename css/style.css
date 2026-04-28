@@ -371,14 +371,11 @@ a:hover {
 }
 
 /* Career Timeline */
-.career-timeline-container {
-    margin-top: 3rem;
+.project-card {
+    min-width: 320px;
+    height: auto;
+    min-height: 200px;
     padding: 2rem;
-    background: var(--glass-bg);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border);
-    border-radius: 16px;
-    box-shadow: var(--glass-shadow);
     position: relative;
 }
 

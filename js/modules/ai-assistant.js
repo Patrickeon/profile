@@ -170,7 +170,6 @@ export function initAIAssistant(supabase) {
     // Gemini/Groq 등 외부 API 프록시 (Supabase Edge Function 연동)
 
     async function getLlama3BResponse(userQuery) {
-        // const GROQ_API_KEY = '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';
 
         // 💡 방어적 코드 추가: supabase 객체가 없으면 로컬 모드로 폴백하거나 에러 출력
         if (!supabase) {
@@ -243,33 +242,6 @@ export function initAIAssistant(supabase) {
 
     }
 
-    // 허깅페이스 API 호출 함수
-    async function generateAIContent(type, prompt) {
-        // IMPORTANT: Replace this value with your own Hugging Face token
-        // For security, consider using environment variables or a config file in production
-        const HF_TOKEN = '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'; // <-- REPLACE WITH YOUR HUGGING FACE TOKEN
-
-        // Check if token has been customized
-        if (HF_TOKEN === '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') {
-            console.warn('[Security Warning] Using default Hugging Face token. Please replace with your own token for security.');
-        }
-
-        // 모델 설정
-        const model = type === 'image'
-            ? 'black-forest-labs/FLUX.1-schnell' // 이미지 생성 (매우 빠름)
-            : 'facebook/musicgen-small';         // 음악 생성
-
-        const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
-            headers: { Authorization: `Bearer ${HF_TOKEN}` },
-            method: "POST",
-            body: JSON.stringify({ inputs: prompt }),
-        });
-
-        if (!response.ok) throw new Error("AI 생성 실패");
-
-        const blob = await response.blob();
-        return URL.createObjectURL(blob); // 생성된 파일의 임시 URL 반환
-    }
 
     // ai-assistant.js 내 generateMedia 함수 수정
     async function generateMedia(type, prompt) {
@@ -369,7 +341,7 @@ export function initAIAssistant(supabase) {
                 // 2. 일반 대화 (Supabase Edge Function API 연동)
                 else {
                     loader = createLoader('AI 서버와 통신 중...');
-                    
+
                     const response = await getLlama3BResponse(query);
 
                     loader.remove();
