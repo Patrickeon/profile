@@ -43,7 +43,7 @@
     --neon-blue-glow: rgba(0, 102, 204, 0.3);
     --neon-purple: #7a00cc;
     --neon-purple-glow: rgba(122, 0, 204, 0.3);
-    
+
     --text-primary: #1a202c;
     --text-secondary: #4a5568;
     --text-muted: #718096;
@@ -380,6 +380,7 @@ a:hover {
 }
 
 .career-timeline-title {
+    margin-top: 20px;
     font-size: 1.5rem;
     margin-bottom: 2rem;
     color: var(--text-primary);
@@ -399,7 +400,8 @@ a:hover {
 .career-timeline {
     position: relative;
     padding: 2rem 0;
-    min-height: 800px; /* Ensure enough space for all items */
+    min-height: 800px;
+    /* Ensure enough space for all items */
 }
 
 .career-timeline-line {
@@ -422,14 +424,17 @@ a:hover {
 
 .career-period.left {
     left: 0;
-    text-align: left; /* Align text to left for uniform indentation */
-    padding-right: 2rem; /* Reduced gap from center line */
+    text-align: left;
+    /* Align text to left for uniform indentation */
+    padding-right: 2rem;
+    /* Reduced gap from center line */
 }
 
 .career-period.right {
     left: 50%;
     text-align: left;
-    padding-left: 2rem; /* Reduced gap from center line */
+    padding-left: 2rem;
+    /* Reduced gap from center line */
     margin-left: 3rem;
 }
 
@@ -485,6 +490,7 @@ a:hover {
 /* --- 6. Temporary/Initial Component Styles (To be refined in later phases) --- */
 
 .career-timeline-title {
+    margin-top: 20px;
     font-size: 1.5rem;
     margin-bottom: 2rem;
     color: var(--text-primary);
@@ -541,8 +547,10 @@ a:hover {
 
 .career-period.left {
     left: 0;
-    text-align: left; /* Keep left alignment */
-    padding-right: 2rem; /* Reduced gap */
+    text-align: left;
+    /* Keep left alignment */
+    padding-right: 2rem;
+    /* Reduced gap */
     /* Add smooth transition for better UX */
     transition: all 0.3s ease;
 }
@@ -550,7 +558,8 @@ a:hover {
 .career-period.right {
     left: 50%;
     text-align: left;
-    padding-left: 2rem; /* Reduced gap */
+    padding-left: 2rem;
+    /* Reduced gap */
     margin-left: 3rem;
     /* Add smooth transition for better UX */
     transition: all 0.3s ease;
@@ -574,11 +583,13 @@ a:hover {
 
 /* Override positioning for left and right sides */
 .career-period.left .career-dot {
-    left: calc(100% - 1px); /* Position at right edge of left side */
+    left: calc(100% - 1px);
+    /* Position at right edge of left side */
 }
 
 .career-period.right .career-dot {
-    left: 0; /* Position at left edge of right side (which is at 50% of container) */
+    left: 0;
+    /* Position at left edge of right side (which is at 50% of container) */
 }
 
 .career-content {
@@ -592,7 +603,8 @@ a:hover {
     padding: 1.5rem 2rem;
     box-shadow: var(--glass-shadow);
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-    text-align: left; /* Enforce left alignment for text inside cards */
+    text-align: left;
+    /* Enforce left alignment for text inside cards */
 }
 
 .career-period:hover .career-content {
@@ -620,7 +632,8 @@ a:hover {
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.5;
-    max-height: 4.5rem; /* 3 lines */
+    max-height: 4.5rem;
+    /* 3 lines */
 }
 
 /* Allow expanding on hover */
@@ -775,11 +788,11 @@ a:hover {
 .skill-graph-container {
     position: relative;
     width: 100%;
-    min-height: 500px;
-    margin-top: 2rem;
+    min-height: 650px;
+    margin-top: 4rem;
     border-radius: 8px;
     background: rgba(0, 0, 0, 0.2);
-    overflow: hidden;
+    /* overflow: hidden; Removed to prevent node clipping on hover */
 }
 
 /* SVG Line Layer */
@@ -1021,44 +1034,109 @@ a:hover {
 
 .project-card {
     width: 350px;
-    height: 400px;
+    height: 420px;
     flex-shrink: 0;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
-    /* Transition handled by Vanilla-tilt for transform, but add color transitions here */
-    transition: box-shadow 0.3s ease, border-color 0.3s ease;
-    /* Specific glass overrides for cards */
+    padding: 2.5rem;
+    border-radius: 20px;
     background: var(--glass-bg);
-    border-top: 1px solid var(--glass-border);
-    border-left: 1px solid var(--glass-border);
-    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    /* overflow: hidden; removed to prevent hover clipping */
 }
 
 .project-card:hover {
-    box-shadow: 0 15px 35px rgba(0, 243, 255, 0.2);
-    border-color: rgba(0, 243, 255, 0.4);
+    transform: translateY(-10px) scale(1.02);
+    border-color: var(--neon-blue);
+    box-shadow: 0 20px 40px rgba(0, 243, 255, 0.2);
+}
+
+.project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.project-category {
+    font-family: var(--font-code);
+    font-size: 0.75rem;
+    color: var(--neon-blue);
+    background: rgba(0, 243, 255, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 243, 255, 0.3);
 }
 
 .project-year {
-    color: var(--neon-purple);
+    color: var(--text-muted);
     font-family: var(--font-code);
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-    text-shadow: 0 0 10px var(--neon-purple-glow);
+    font-size: 0.9rem;
 }
 
 .project-title {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    line-height: 1.3;
     margin-bottom: 0.5rem;
+    font-family: var(--font-heading);
+    color: var(--text-primary);
+}
+
+.project-company {
+    font-size: 0.9rem;
+    color: var(--neon-purple);
+    margin-bottom: 1rem;
+    font-weight: 500;
 }
 
 .project-desc {
-    font-size: 1rem;
-    margin-bottom: 0;
+    font-size: 0.95rem;
     color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.project-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: auto;
+}
+
+.project-tag {
+    font-size: 0.7rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 8px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    color: var(--text-muted);
+}
+
+.project-tag-more {
+    font-size: 0.7rem;
+    color: var(--neon-blue);
+}
+
+.project-footer {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.project-footer .read-more {
+    font-size: 0.8rem;
+    font-family: var(--font-code);
+    color: var(--neon-blue);
+    letter-spacing: 1px;
 }
 
 /* Chat Container styling (Terminal Look) */

@@ -7,7 +7,7 @@
 
 /* 게시판 컨테이너: 글래스모피즘 패널 적용 */
 .board-container {
-    padding: 2.5rem;
+    padding: 4rem 2.5rem; /* Increased top padding to 4rem to avoid hover clipping */
     min-height: 600px;
     margin-top: 1rem;
 }
@@ -89,7 +89,7 @@
     cursor: pointer;
     transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     position: relative;
-    overflow: hidden;
+    /* overflow: hidden; removed to prevent hover clipping */
     backdrop-filter: blur(10px);
 }
 

@@ -31,9 +31,20 @@ function initProjectTimeline() {
         card.setAttribute('data-id', project.id);
 
         card.innerHTML = `
-            <div class="project-year">${project.year}</div>
+            <div class="project-header">
+                <span class="project-category">${project.category.toUpperCase()}</span>
+                <div class="project-year">${project.year}</div>
+            </div>
             <h3 class="project-title">${project.title}</h3>
-            <p class="project-desc">[${project.company}]<br>${project.desc}</p>
+            <div class="project-company">${project.company}</div>
+            <p class="project-desc">${project.desc}</p>
+            <div class="project-tags">
+                ${project.tech.slice(0, 3).map(t => `<span class="project-tag">${t}</span>`).join('')}
+                ${project.tech.length > 3 ? `<span class="project-tag-more">+${project.tech.length - 3}</span>` : ''}
+            </div>
+            <div class="project-footer">
+                <span class="read-more">DETAIL VIEW ></span>
+            </div>
         `;
 
         // 클릭 이벤트: 모달 열기 (Project Hub와 동일한 동작)
@@ -169,9 +180,9 @@ function initSkillGraph() {
                 const x = (col + 0.5) * cellWidth + jitterX;
                 const y = (row + 0.5) * cellHeight + jitterY;
                 
-                // Keep away from edges (10% padding)
+                // Keep away from edges (15% padding at top/bottom, 10% sides)
                 const safeX = Math.max(containerWidth * 0.1, Math.min(containerWidth * 0.9, x));
-                const safeY = Math.max(containerHeight * 0.1, Math.min(containerHeight * 0.9, y));
+                const safeY = Math.max(containerHeight * 0.15, Math.min(containerHeight * 0.85, y));
                 
                 node.style.left = `${safeX}px`;
                 node.style.top = `${safeY}px`;
@@ -179,9 +190,10 @@ function initSkillGraph() {
         }
 
         function drawLinks() {
+            if (!skillGraph || !svgLayer) return;
+            
             svgLayer.innerHTML = '';
             links.length = 0;
-            const graphRect = skillGraph.getBoundingClientRect();
 
             nodes.forEach(sourceNode => {
                 const sourceId = sourceNode.dataset.id;
@@ -192,12 +204,11 @@ function initSkillGraph() {
                     targets.forEach(targetId => {
                         const targetNode = document.querySelector(`.skill-node[data-id="${targetId}"]`);
                         if (targetNode) {
-                            const sRect = sourceNode.getBoundingClientRect();
-                            const tRect = targetNode.getBoundingClientRect();
-                            const x1 = sRect.left - graphRect.left + (sRect.width / 2);
-                            const y1 = sRect.top - graphRect.top + (sRect.height / 2);
-                            const x2 = tRect.left - graphRect.left + (tRect.width / 2);
-                            const y2 = tRect.top - graphRect.top + (tRect.height / 2);
+                            // Use the explicit coordinates set in layoutNodes for perfect accuracy
+                            const x1 = parseFloat(sourceNode.style.left);
+                            const y1 = parseFloat(sourceNode.style.top);
+                            const x2 = parseFloat(targetNode.style.left);
+                            const y2 = parseFloat(targetNode.style.top);
 
                             const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
                             line.setAttribute('x1', x1);
@@ -213,8 +224,15 @@ function initSkillGraph() {
             });
         }
 
+        // 초기 레이아웃 수행
         layoutNodes();
-        setTimeout(drawLinks, 100);
+        
+        // 레이아웃이 브라우저에 반영된 후 선을 그리기 위해 requestAnimationFrame 사용
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                drawLinks();
+            });
+        });
         
         window.addEventListener('resize', () => {
             layoutNodes();
