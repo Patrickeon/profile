@@ -143,7 +143,21 @@ export function initAIAssistant(supabase) {
                     <p style="font-size:0.7rem; margin-top:5px; color:var(--neon-purple);">> Audio Synthesized via MusicGen</p>
                 </div>`;
         } else {
-            content = `<div class="message-bubble">${text.replace(/\n/g, '<br>')}</div>`;
+            // 마크다운 파싱 (marked 라이브러리 존재 여부 확인)
+            let parsedText = text;
+            try {
+                if (window.marked && typeof window.marked.parse === 'function') {
+                    parsedText = window.marked.parse(text);
+                } else if (typeof marked === 'function') {
+                    parsedText = marked(text);
+                } else {
+                    parsedText = text.replace(/\n/g, '<br>');
+                }
+            } catch (e) {
+                console.error("Markdown parsing error:", e);
+                parsedText = text.replace(/\n/g, '<br>');
+            }
+            content = `<div class="message-bubble markdown-body">${parsedText}</div>`;
         }
 
         msgDiv.innerHTML = content;

@@ -1250,11 +1250,74 @@ a:hover {
 .user-message .message-bubble {
     border-right: 3px solid var(--neon-purple);
     background: rgba(157, 0, 255, 0.12);
+    color: var(--text-primary);
+    border-top-right-radius: 4px;
 }
 
 [data-theme="light"] .user-message .message-bubble {
     background: rgba(122, 0, 204, 0.08);
     color: #1a202c;
+}
+
+/* --- Markdown Body Styling within Chat --- */
+.markdown-body {
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.markdown-body p {
+    margin-bottom: 0.5rem;
+}
+
+.markdown-body p:last-child {
+    margin-bottom: 0;
+}
+
+.markdown-body code {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: var(--font-code);
+    font-size: 0.85em;
+    color: var(--neon-blue);
+}
+
+.markdown-body pre {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--glass-border);
+}
+
+.markdown-body pre code {
+    background: transparent;
+    padding: 0;
+    color: #e6edf3;
+    font-size: 0.85rem;
+}
+
+.markdown-body ul, .markdown-body ol {
+    margin-bottom: 0.5rem;
+    padding-left: 1.5rem;
+}
+
+.markdown-body li {
+    margin-bottom: 0.25rem;
+}
+
+.markdown-body strong {
+    color: var(--neon-blue);
+    font-weight: 600;
+}
+
+[data-theme="light"] .markdown-body code {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .markdown-body pre {
+    background: #1a1b26;
 }
 
 /* Chat Input Area (Fixed Bottom) */
