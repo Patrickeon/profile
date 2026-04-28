@@ -1,9 +1,4 @@
-/**
- * 프로젝트 보드(Archive) 모듈
- * Supabase 데이터 페칭, 필터링, 검색 및 렌더링을 담당합니다.
- */
-
-import { openModal } from './modal.js';
+import { projectsData } from '../data/projects-data.js';
 
 export async function initProjectBoard(supabase) {
     const projectGrid = document.getElementById('project-grid');
@@ -43,34 +38,10 @@ export async function initProjectBoard(supabase) {
 async function renderProjects(container, supabase, filter = 'all', search = '') {
     container.innerHTML = '<p class="code-font" style="grid-column: 1/-1; text-align: center;">> Scanning Knowledge Base...</p>';
 
-    // Fallback Data (DB 연결 전 또는 데이터가 없을 때 사용)
-    // 사용자의 요청에 따라 거의 모든 프로젝트를 WEB 카테고리에도 포함되도록 보강했습니다.
-    const fallbackData = [
-        { id: 1, category: 'web', title: '코닝정밀소재 AI 문서표준화', year: '2025', desc: 'Java, Spring Boot, Vue.js 기반의 기업용 AI 솔루션' },
-        { id: 2, category: 'web', title: '하나캐피탈 LLM 챗봇', year: '2025-2026', desc: 'Java, Spring Boot, JSP, jQuery를 활용한 금융권 챗봇 시스템' },
-        { id: 3, category: 'ai', title: 'Gen AI 페르소나 솔루션', year: '2024-2025', desc: '자체 LLM 페르소나 엔진 및 관리툴 개발 (WEB 기반)' },
-        { id: 4, category: 'web', title: 'SBL G.AI 문서표준화플랫폼', year: '2024', desc: '삼성바이오로직스용 Java, Spring, Vue.js 웹 플랫폼' },
-        { id: 5, category: 'web', title: 'STO 플랫폼 (ST Galaxia)', year: '2023-2024', desc: '갤럭시아머니트리 STO 웹 서비스 (JS, jQuery, Java)' },
-        { id: 6, category: 'web', title: 'AGING LOC HealthCare', year: '2022-2023', desc: 'Flutter 기반이지만 웹 관리 모듈을 포함한 헬스케어 플랫폼' },
-        { id: 7, category: 'web', title: '㈜살방 구축 서비스', year: '2021', desc: 'JS, React Native, Expo, GraphQL 기반 웹/앱 서비스' },
-        { id: 8, category: 'ai', title: 'AI 챗봇 솔루션', year: '2017-2019', desc: '롯데카드, 우리카드용 대형 AI 챗봇 엔진 (Java, Meteor)' },
-        { id: 9, category: 'system', title: '공정 자동화 설비', year: '2012-2013', desc: 'C, PLC, Window 기반의 시스템 제어 및 모니터링' },
-    ];
-
-    // AI/WEB 중복 표시를 위해 카테고리 체크 로직 개선
-    // 사용자가 'WEB에도 추가해달라'고 함.
-    fallbackData.forEach(item => {
-        if (item.title.includes('AI') || item.title.includes('챗봇') || item.title.includes('LLM')) {
-            // 이 데이터들은 AI 카테고리이지만 사실상 WEB이기도 함. 
-            // 렌더링 시 필터 로직에서 유연하게 처리.
-        }
-    });
-
-    // 사용자의 요청으로 DB 연동 대신 항상 기본 예시 데이터(fallbackData)만 사용하도록 변경했습니다.
-    let projects = fallbackData.filter(p => {
+    // 사용자의 요청으로 DB 연동 대신 중앙 집중화된 projectsData를 사용합니다.
+    let projects = projectsData.filter(p => {
         if (filter === 'all') return true;
         if (filter === 'web') {
-            // WEB 카테고리 선택 시, 명시적 web 외에도 ai 프로젝트 중 상당수를 포함
             return p.category === 'web' || p.category === 'ai';
         }
         return p.category === filter;
@@ -81,7 +52,7 @@ async function renderProjects(container, supabase, filter = 'all', search = '') 
         if (search) {
             projects = projects.filter(p =>
                 p.title.toLowerCase().includes(search.toLowerCase()) ||
-                (p.description || p.desc).toLowerCase().includes(search.toLowerCase())
+                p.desc.toLowerCase().includes(search.toLowerCase())
             );
         }
 
@@ -96,36 +67,47 @@ async function renderProjects(container, supabase, filter = 'all', search = '') 
             const card = document.createElement('div');
             card.classList.add('board-card');
             card.style.opacity = '0';
+            card.setAttribute('data-id', p.id); // ID 저장
             card.innerHTML = `
                 <div class="card-tag">${p.category.toUpperCase()}</div>
                 <h3 class="card-title">${p.title}</h3>
-                <p class="card-desc">${p.description || p.desc}</p>
+                <p class="card-desc">${p.desc}</p>
                 <div class="card-footer">
                     <span class="card-date">${p.year}</span>
-                    <span class="read-more" data-title="${p.title}">DETAIL ></span>
+                    <span class="read-more">DETAIL ></span>
                 </div>
             `;
             container.appendChild(card);
         });
 
-        // DETAIL 버튼 클릭 이벤트 바인딩 (이벤트 위임 사용)
-        container.addEventListener('click', (e) => {
-            const btn = e.target.closest('.read-more');
-            if (btn) {
-                const title = btn.getAttribute('data-title');
-                const project = projects.find(p => p.title === title) || projects[0];
-                
-                // 기술 스택 추출 (DESC 안의 쉼표나 영단어 덩어리들을 단순 파싱)
-                let techStack = [];
-                const techMatch = (project.desc || project.description || '').match(/[A-Za-z.\s,]+/);
-                if (techMatch) {
-                    techStack = techMatch[0].split(',').map(t => t.trim()).filter(Boolean);
-                }
+        // 카드 클릭 이벤트 바인딩 (이벤트 위임 사용 - 카드 전체 클릭 가능)
+        container.onclick = (e) => {
+            const card = e.target.closest('.board-card');
+            if (card) {
+                const id = parseInt(card.getAttribute('data-id'));
+                const project = projectsData.find(p => p.id === id);
 
-                // Modal 띄우기 (연결 완료!)
-                openModal(project.year, project.title, project.desc || project.description, techStack);
+                if (project) {
+                    openModal(project.year, project.title, project.desc, project.tech);
+                }
             }
-        });
+        };
+
+        // GSAP 애니메이션 적용
+        if (window.gsap) {
+            window.gsap.fromTo('.board-card',
+                { y: 30, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power2.out' }
+            );
+        } else {
+            document.querySelectorAll('.board-card').forEach(c => c.style.opacity = '1');
+        }
+
+    } catch (err) {
+        console.error('Board Rendering Error:', err);
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #ff5f56;">[ERROR] 데이터 렌더링에 실패했습니다.</p>';
+    }
+}
 
         // GSAP 애니메이션 적용
         if (window.gsap) {

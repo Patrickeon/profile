@@ -18,34 +18,7 @@ export function initAIAssistant(supabase) {
 
     if (!aiTrigger || !aiPopup) return;
 
-    let aiWorker = null;
-    let isModelLoading = false;
-    let modelReady = false;
-
-    // Web Worker 초기화
-    function initWorker() {
-        if (aiWorker) return;
-
-        aiWorker = new Worker(new URL('./ai-worker.js', import.meta.url), { type: 'module' });
-
-        aiWorker.onmessage = (e) => {
-            const { type, data } = e.data;
-            if (type === 'progress') {
-                if (data && data.status === 'progress' && data.progress !== undefined) {
-                    statusText.innerText = `Status: Downloading... ${data.progress.toFixed(1)}%`;
-                }
-            } else if (type === 'ready') {
-                modelReady = true;
-                statusText.innerText = "Status: On-Device AI Active (Lightweight)";
-                document.dispatchEvent(new CustomEvent('ai-model-ready'));
-            } else if (type === 'error') {
-                statusText.innerText = "Status: Worker Error";
-                // data가 객체일 수도 있고 문자열일 수도 있으므로 안전하게 처리
-                const errorMessage = data === undefined ? 'No error details received' : (typeof data === 'string' ? data : JSON.stringify(data));
-                console.error('Worker Error:', errorMessage);
-            }
-        };
-    }
+    // API 연결 설정 완료
 
     // 👇 (향상된 부분) 추천 질문 칩 생성 함수 - 컨텍스트 인식 및 동적 제안
     function addSuggestionChips() {
@@ -68,8 +41,7 @@ export function initAIAssistant(supabase) {
                 "🛠️ 오늘의 기술 스택 분석해줘",
                 "📚 최근 학습 중인 기술은 뭐야?",
                 "💡 현재 관심 있는 AI 트렌드는?",
-                "🎨 /image 미래지향적 업무 환경",
-                "🎵 /music 집중력 향상 비트"
+                "🎨 /image futuristic workspace with holographic displays"
             ];
         } else if (hour >= 12 && hour < 18) {
             // 오후: 프로젝트 및 경력 관련 질문
@@ -77,8 +49,7 @@ export function initAIAssistant(supabase) {
                 "📂 주요 프로젝트 요약해줘",
                 "👨💻 Patrick은 어떤 성향의 개발자야?",
                 "🚀 가장 도전적이었던 프로젝트는?",
-                "🎨 /image 사이버펑크 도시",
-                "🎵 /music 미래지향적 비트"
+                "🎨 /image cyberpunk city at night with neon lights"
             ];
         } else {
             // 저녁/밤: 반성 및 미래 지향 질문
@@ -86,8 +57,7 @@ export function initAIAssistant(supabase) {
                 "🌟 오늘의 성찰: 배운 점은?",
                 "🔮 미래 기술 로드맵은 어떻게 돼?",
                 "📈 커리어 목표 및 방향성은?",
-                "🎨 /image AI와 인간의 협업 미래상",
-                "🎵 /music 편안한 전자 음악"
+                "🎨 /image AI and human collaboration in the future"
             ];
         }
 
@@ -137,12 +107,11 @@ export function initAIAssistant(supabase) {
         }, 50);
     }
 
-    // 팝업 열기/닫기 (이 부분을 아래처럼 수정)
+    // 팝업 열기/닫기
     aiTrigger.addEventListener('click', () => {
         aiPopup.classList.toggle('active');
         if (aiPopup.classList.contains('active')) {
             aiChatInput.focus();
-            if (!aiWorker) initWorker();
 
             // 👇 팝업이 열릴 때 추천 칩 생성 함수 호출
             addSuggestionChips();
@@ -198,31 +167,7 @@ export function initAIAssistant(supabase) {
         return loaderDiv;
     }
 
-    /**
-     * [최초 실행] On-Device 모델 로드 요청
-     */
-    async function loadOnDeviceModel() {
-        if (modelReady) return true;
-        if (isModelLoading) return false;
-
-        isModelLoading = true;
-        const loader = createLoader('최적화된 로컬 모델 매칭 중 (SmolLM2-135M)...');
-        statusText.innerText = "Status: Initializing AI Engine...";
-
-        if (!aiWorker) initWorker();
-        aiWorker.postMessage({ type: 'load' });
-
-        return new Promise((resolve) => {
-            const onReady = () => {
-                loader.remove();
-                addChatMessage('AI', "경량화된 로컬 모델이 준비되었습니다! 이제 UI 끊김 없이 대화할 수 있습니다.");
-                document.removeEventListener('ai-model-ready', onReady);
-                isModelLoading = false;
-                resolve(true);
-            };
-            document.addEventListener('ai-model-ready', onReady);
-        });
-    }
+    // Gemini/Groq 등 외부 API 프록시 (Supabase Edge Function 연동)
 
     async function getLlama3BResponse(userQuery) {
         // const GROQ_API_KEY = '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';
@@ -385,6 +330,12 @@ export function initAIAssistant(supabase) {
                     element.appendChild(cursor);
                     i++;
 
+                    // 텍스트가 추가될 때마다 스크롤을 맨 아래로 자동 이동
+                    const chatBody = document.getElementById('ai-chat-body');
+                    if (chatBody) {
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                    }
+
                     // 자연스러운 타이핑을 위한 랜덤 속도 변동
                     const randomSpeed = speed + Math.random() * 20;
                     setTimeout(type, randomSpeed);
@@ -415,18 +366,12 @@ export function initAIAssistant(supabase) {
                     loader.remove();
                     addChatMessage('AI', imageUrl, 'image');
                 }
-                // 2. 음악 생성 명령어 (/music)
-                else if (query.startsWith('/music ')) {
-                    const prompt = query.replace('/music ', '');
-                    loader = createLoader(`오디오 데이터 합성 중: "${prompt}"...`);
-                    const audioUrl = await generateMedia('music', prompt); // Step 4에서 구현
-                    loader.remove();
-                    addChatMessage('AI', audioUrl, 'audio');
-                }
-                // 3. 일반 대화 (Groq)
+                // 2. 일반 대화 (Supabase Edge Function API 연동)
                 else {
-                    loader = createLoader('데이터 패킷 분석 중...');
+                    loader = createLoader('AI 서버와 통신 중...');
+                    
                     const response = await getLlama3BResponse(query);
+
                     loader.remove();
 
                     const msgDiv = document.createElement('div');

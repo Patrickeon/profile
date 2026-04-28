@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         initAIAssistant(supabaseClient);
 
         // 터미널 Contact 섹션
-        initContact();
+        initContact(supabaseClient);
 
         // 테마 매니저 토글 활성화
         initThemeToggle();

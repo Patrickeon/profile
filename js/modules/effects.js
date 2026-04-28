@@ -1,17 +1,60 @@
-/**
- * UI 효과 관련 모듈 (tsParticles, Glitch, Skill Graph, GSAP Scroll, Vanilla Tilt)
- * 모든 비주얼 이펙트 로직을 통합 관리합니다.
- */
+import { projectsData } from '../data/projects-data.js';
+import { openModal } from './modal.js';
 
 export function initEffects() {
     initParticles();
     initTypingEffect();
     initSkillGraph();
+    initProjectTimeline(); // 추가: 프로젝트 타임라인 동적 생성
     initHorizontalScroll();
     initVanillaTilt();
     initAccessibilityEnhancements();
     initCareerTimeline();
 }
+
+/**
+ * 프로젝트 타임라인 (Section 02) 동적 생성
+ */
+function initProjectTimeline() {
+    const timelineTrack = document.querySelector('.timeline-track');
+    if (!timelineTrack) return;
+
+    // 기존 하드코딩된 내용 삭제
+    timelineTrack.innerHTML = '';
+
+    projectsData.forEach(project => {
+        const card = document.createElement('div');
+        card.className = 'project-card glass-panel';
+        card.setAttribute('data-tilt', '');
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('data-id', project.id);
+
+        card.innerHTML = `
+            <div class="project-year">${project.year}</div>
+            <h3 class="project-title">${project.title}</h3>
+            <p class="project-desc">[${project.company}]<br>${project.desc}</p>
+        `;
+
+        // 클릭 이벤트: 모달 열기 (Project Hub와 동일한 동작)
+        card.addEventListener('click', () => {
+            openModal(project.year, project.title, project.desc, project.tech);
+        });
+
+        timelineTrack.appendChild(card);
+    });
+
+    // 동적 생성 후 Vanilla Tilt 다시 적용 (동적으로 추가된 요소에는 수동 적용 필요)
+    if (typeof VanillaTilt !== 'undefined') {
+        VanillaTilt.init(timelineTrack.querySelectorAll(".project-card"), {
+            max: 15,
+            speed: 400,
+            glare: true,
+            "max-glare": 0.3
+        });
+    }
+}
+
 
 /**
  * 1. tsParticles 초기화 (신경망 배경 효과)
@@ -101,6 +144,39 @@ function initSkillGraph() {
     const links = [];
 
     if (skillGraph && svgLayer && nodes.length > 0) {
+        // 1. Position nodes organically but evenly
+        function layoutNodes() {
+            const containerWidth = skillGraph.offsetWidth;
+            const containerHeight = skillGraph.offsetHeight;
+            const nodeCount = nodes.length;
+            
+            // Calculate grid to distribute nodes
+            const cols = Math.ceil(Math.sqrt(nodeCount * (containerWidth / containerHeight)));
+            const rows = Math.ceil(nodeCount / cols);
+            
+            const cellWidth = containerWidth / cols;
+            const cellHeight = containerHeight / rows;
+            
+            nodes.forEach((node, index) => {
+                const col = index % cols;
+                const row = Math.floor(index / cols);
+                
+                // Position within the cell with some organic jitter (30% of cell size)
+                const jitterX = (Math.random() - 0.5) * cellWidth * 0.6;
+                const jitterY = (Math.random() - 0.5) * cellHeight * 0.6;
+                
+                const x = (col + 0.5) * cellWidth + jitterX;
+                const y = (row + 0.5) * cellHeight + jitterY;
+                
+                // Keep away from edges (10% padding)
+                const safeX = Math.max(containerWidth * 0.1, Math.min(containerWidth * 0.9, x));
+                const safeY = Math.max(containerHeight * 0.1, Math.min(containerHeight * 0.9, y));
+                
+                node.style.left = `${safeX}px`;
+                node.style.top = `${safeY}px`;
+            });
+        }
+
         function drawLinks() {
             svgLayer.innerHTML = '';
             links.length = 0;
@@ -136,8 +212,13 @@ function initSkillGraph() {
             });
         }
 
+        layoutNodes();
         setTimeout(drawLinks, 100);
-        window.addEventListener('resize', drawLinks);
+        
+        window.addEventListener('resize', () => {
+            layoutNodes();
+            drawLinks();
+        });
 
         // Add proficiency indicators and tooltips to skill nodes
         nodes.forEach(node => {
@@ -307,10 +388,10 @@ function initCareerTimeline() {
         },
         {
             year: '2016',
-            title: 'Full Stack Developer',
+            title: 'Software Engineer',
             company: 'ABL',
             description: '화상 고객 서비스 시스템 개발',
-            technologies: ['Java', 'MariaDB', 'MongoDB'],
+            technologies: ['Java', 'MariaDB', 'MongoDB', 'jQuery', 'JSP', 'Spring Boot'],
             side: 'right'
         },
         {
@@ -395,26 +476,22 @@ function initCareerTimeline() {
         },
         {
             year: '2025-2026',
-            title: 'Senior AI Consultant',
+            title: 'LLM & Full-Stack Engineer',
             company: '페르소나 AI',
-            description: '하나캐피탈 LLM 챗봇 프로젝트 리드',
-            technologies: ['Java', 'Spring Boot', 'JSP', 'jQuery'],
+            description: '하나캐피탈 폐쇄망 렌터카 AI 챗봇 구축 (LLM 튜닝 및 RAG 개발)',
+            technologies: ['Python', 'vLLM', 'Java', 'Spring Boot', 'JSP', 'JavaScript', 'jQuery', 'Linux', 'MySQL'],
             side: 'left'
         }
     ];
 
-    careerData.forEach((period, index) => {
+    // 1. 모든 요소를 먼저 DOM에 추가 (높이 계산을 위해)
+    careerData.forEach((period) => {
         const periodElement = document.createElement('div');
         periodElement.className = `career-period ${period.side}`;
 
-        // Calculate position based on index to distribute evenly
-        const totalPeriods = careerData.length;
-        const positionPercent = ((index + 1) / (totalPeriods + 1)) * 100;
-        periodElement.style.top = `${positionPercent}%`;
-
         periodElement.innerHTML = `
-            <div class="career-period dot"></div>
-            <div class="career-period content">
+            <div class="career-dot"></div>
+            <div class="career-content">
                 <div class="career-year">${period.year}</div>
                 <div class="career-title">${period.title}</div>
                 <div class="career-company">${period.company}</div>
@@ -424,7 +501,31 @@ function initCareerTimeline() {
                 </div>
             </div>
         `;
-
         careerTimeline.appendChild(periodElement);
+        period.element = periodElement; // 참조 저장
     });
+
+    // 2. DOM에 렌더링된 요소의 실제 높이(offsetHeight)를 측정하여 엇갈리게(Staggered) 배치
+    // 브라우저 렌더링이 안정화될 때까지 짧은 지연시간(setTimeout) 후 위치 계산
+    setTimeout(() => {
+        let leftY = 0;
+        let rightY = 100; // 우측 항목들을 초기에 100px 정도 아래로 내려서 자연스럽게 엇갈리도록 설정
+        const verticalPadding = 30; // 같은 쪽(동일 측면) 카드 사이의 간격
+
+        careerData.forEach((period) => {
+            const el = period.element;
+            const height = el.offsetHeight;
+
+            if (period.side === 'left') {
+                el.style.top = `${leftY}px`;
+                leftY += height + verticalPadding;
+            } else {
+                el.style.top = `${rightY}px`;
+                rightY += height + verticalPadding;
+            }
+        });
+
+        // 타임라인 컨테이너 전체 높이를 가장 아래쪽 카드의 높이에 맞춤
+        careerTimeline.style.minHeight = `${Math.max(leftY, rightY) + 50}px`;
+    }, 0);
 }

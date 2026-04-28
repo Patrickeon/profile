@@ -36,9 +36,9 @@ export function initThemeToggle() {
 
     // Check system preference & localStorage
     const savedTheme = localStorage.getItem('theme');
-    const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
 
-    if (savedTheme === 'light' || (!savedTheme && prefersLight)) {
+    // Default to dark mode unless user explicitly selected light mode
+    if (savedTheme === 'light') {
         setTheme('light');
     } else {
         setTheme('dark');

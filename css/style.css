@@ -417,60 +417,22 @@ a:hover {
 
 .career-period {
     position: absolute;
-    width: 45%;
-    padding: 1rem 2rem;
+    width: 50%;
+    padding: 0;
     box-sizing: border-box;
     transition: all 0.3s ease;
 }
 
 .career-period.left {
     left: 0;
-    text-align: right;
-    padding-right: 3rem;
+    text-align: left; /* Align text to left for uniform indentation */
+    padding-right: 2rem; /* Reduced gap from center line */
 }
 
 .career-period.right {
     left: 50%;
     text-align: left;
-    padding-left: 3rem;
-}
-
-.career-period.dot {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: var(--neon-blue);
-    border-radius: 50%;
-    box-shadow: 0 0 0 4px rgba(0, 243, 255, 0.2);
-    z-index: 10;
-}
-
-/* Position dots correctly based on side */
-.career-period.left .career-period.dot {
-    right: -25px;
-    left: auto;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.career-period.right .career-period.dot {
-    left: -25px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.career-period.content {
-    z-index: 5;
-    width: 100%;
-    top: 0;
-    left: 0;
-}
-
-.career-period.left .career-period.content {
-    margin-right: 3rem;
-}
-
-.career-period.right .career-period.content {
+    padding-left: 2rem; /* Reduced gap from center line */
     margin-left: 3rem;
 }
 
@@ -570,10 +532,9 @@ a:hover {
 }
 
 .career-period {
-    position: relative;
+    position: absolute;
     width: 50%;
-    padding: 1rem 2rem;
-    margin-bottom: 2rem;
+    padding: 0;
     /* Prevent overflow on smaller screens */
     max-width: 45%;
     box-sizing: border-box;
@@ -583,9 +544,8 @@ a:hover {
 
 .career-period.left {
     left: 0;
-    text-align: right;
-    padding-right: 3rem;
-    /* Space for the line and dot */
+    text-align: left; /* Keep left alignment */
+    padding-right: 2rem; /* Reduced gap */
     /* Add smooth transition for better UX */
     transition: all 0.3s ease;
 }
@@ -593,13 +553,13 @@ a:hover {
 .career-period.right {
     left: 50%;
     text-align: left;
-    padding-left: 3rem;
-    /* Space for the line and dot */
+    padding-left: 2rem; /* Reduced gap */
+    margin-left: 3rem;
     /* Add smooth transition for better UX */
     transition: all 0.3s ease;
 }
 
-.career-period.dot {
+.career-dot {
     position: absolute;
     top: 50%;
     /* For left-aligned items, position dot on the right edge */
@@ -612,24 +572,45 @@ a:hover {
     transform: translate(-50%, -50%);
     z-index: 10;
     box-shadow: 0 0 0 4px rgba(0, 243, 255, 0.2);
+    transition: all 0.3s ease;
 }
 
 /* Override positioning for left and right sides */
-.career-period.left .career-period.dot {
+.career-period.left .career-dot {
     left: calc(100% - 1px); /* Position at right edge of left side */
 }
 
-.career-period.right .career-period.dot {
+.career-period.right .career-dot {
     left: 0; /* Position at left edge of right side (which is at 50% of container) */
 }
 
-.career-period.content {
+.career-content {
     position: relative;
     z-index: 5;
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    text-align: left; /* Enforce left alignment for text inside cards */
+}
+
+.career-period:hover .career-content {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 40px 0 rgba(0, 243, 255, 0.15);
+    border-color: rgba(0, 243, 255, 0.3);
+}
+
+.career-period:hover .career-dot {
+    transform: translate(-50%, -50%) scale(1.3);
+    box-shadow: 0 0 15px rgba(0, 243, 255, 0.8), 0 0 0 6px rgba(0, 243, 255, 0.3);
 }
 
 /* Improve readability for longer text */
-.career-period.content * {
+.career-content * {
     max-width: 100%;
     word-wrap: break-word;
 }
@@ -646,7 +627,7 @@ a:hover {
 }
 
 /* Allow expanding on hover */
-.career-period.content:hover .career-description {
+.career-content:hover .career-description {
     -webkit-line-clamp: unset;
     max-height: unset;
 }
@@ -797,7 +778,7 @@ a:hover {
 .skill-graph-container {
     position: relative;
     width: 100%;
-    min-height: 400px;
+    min-height: 500px;
     margin-top: 2rem;
     border-radius: 8px;
     background: rgba(0, 0, 0, 0.2);

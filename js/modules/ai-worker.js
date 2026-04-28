@@ -21,8 +21,8 @@ self.onmessage = async (e) => {
     if (type === 'load') {
         try {
             if (!generator) {
-                // 첫 번째 시도: GPT-2
-                currentModelName = 'Xenova/gpt2';
+                // 첫 번째 시도: SmolLM-135M-Instruct
+                currentModelName = 'Xenova/SmolLM-135M-Instruct';
                 generator = await pipeline('text-generation', currentModelName, {
                     quantized: true,
                     progress_callback: (progress) => {
@@ -32,7 +32,7 @@ self.onmessage = async (e) => {
             }
             self.postMessage({ type: 'ready' });
         } catch (err) {
-            console.error('Worker GPT2 Load Error:', err);
+            console.error('Worker SmolLM Load Error:', err);
             // 두 번째 시도: Qwen 모델
             try {
                 currentModelName = 'Xenova/Qwen1.5-0.5B-Chat';
@@ -58,7 +58,7 @@ self.onmessage = async (e) => {
             let prompt = text || '';
 
             // 💡 수정 포인트: generator.model_id 대신 currentModelName 사용
-            if (currentModelName.includes('Qwen')) {
+            if (currentModelName.includes('Qwen') || currentModelName.includes('SmolLM')) {
                 prompt = `<|im_start|>user\n${prompt}<|im_end|>\n<|im_start|>assistant\n`;
             }
 
