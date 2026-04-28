@@ -28,35 +28,32 @@ serve(async (req) => {
 
     if (!type) return json({ error: "type 이 누락되었습니다." }, 400);
 
-    // 1) TEXT (Groq)
+    // 1) TEXT (Gemini API via OpenAI Compatible Endpoint)
     if (type === "text") {
-      const groqKey = Deno.env.get("GROQ_API_KEY");
-      if (!groqKey) return json({ error: "GROQ_API_KEY가 설정되어 있지 않습니다." }, 500);
+      const geminiKey = Deno.env.get("GEMINI_API_KEY");
+      if (!geminiKey) return json({ error: "GEMINI_API_KEY가 설정되어 있지 않습니다. Supabase Secrets를 확인하세요." }, 500);
       if (!Array.isArray(prompt)) return json({ error: "text 타입은 prompt가 messages 배열이어야 합니다." }, 400);
 
-      const r = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/openai/chat/completions`, {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${groqKey}`,
+          "Authorization": `Bearer ${geminiKey}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "llama-3.1-8b-instant",
+          model: "gemini-2.5-flash",
           messages: prompt,
           temperature: 0.7,
         }),
       });
 
-      const text = await r.text();
+      const data = await r.json();
       if (!r.ok) {
-        return json({ error: "Groq 호출 실패", details: text }, r.status);
+        return json({ error: "Gemini 호출 실패", details: data }, r.status);
       }
 
-      // Groq 원문 그대로 반환
-      return new Response(text, {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      // OpenAI API 응답 구조를 그대로 반환
+      return json(data);
     }
 
     // 2) IMAGE (HF Inference - FLUX)
@@ -85,15 +82,42 @@ serve(async (req) => {
       return json({ url: dataUrl }, 200);
     }
 
-    // 3) MUSIC은 프론트에서 HF Spaces(Gradio)로 처리 (무료 데모용)
-    if (type === "music") {
-      return json(
-        {
-          error: "music은 현재 무료 데모 모드로 프론트에서 HF Spaces를 직접 호출합니다.",
-          hint: "프론트 generateMusicFree() 사용",
+    // 3) EMAIL (Resend API - 무료 100건/일)
+    if (type === "email") {
+      const resendKey = Deno.env.get("RESEND_API_KEY");
+      if (!resendKey) return json({ error: "RESEND_API_KEY가 설정되지 않았습니다." }, 500);
+
+      const { from_name, from_email, message } = body;
+      if (!from_name || !from_email || !message) {
+        return json({ error: "from_name, from_email, message 필드가 필요합니다." }, 400);
+      }
+
+      const r = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${resendKey}`,
+          "Content-Type": "application/json",
         },
-        400
-      );
+        body: JSON.stringify({
+          from: "Portfolio Contact <onboarding@resend.dev>",
+          to: ["01051188129e@gmail.com"],
+          subject: `[Portfolio] New message from ${from_name}`,
+          html: `
+            <h2>New Contact Message</h2>
+            <p><strong>From:</strong> ${from_name} (${from_email})</p>
+            <hr/>
+            <p><strong>Message:</strong></p>
+            <p>${message}</p>
+          `,
+          reply_to: from_email,
+        }),
+      });
+
+      const data = await r.json();
+      if (!r.ok) {
+        return json({ error: "이메일 전송 실패", details: data }, r.status);
+      }
+      return json({ success: true, id: data.id });
     }
 
     return json({ error: `지원하지 않는 type: ${type}` }, 400);
